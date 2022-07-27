@@ -56,10 +56,11 @@ func hello_json(w http.ResponseWriter, r *http.Request) {
 	raw_body.Decode(&body_json)
 
 	// formated json
-	pretty, _ := json.MarshalIndent(body_json, "  ", "    ")
+	pretty, _ := json.MarshalIndent(body_json, "  ", "  ")
 
 	// Print received data to log
-	log.Println(req_id, "DATA\n", string(pretty))
+	log.Println(req_id, "DATA:", string(pretty))
+	log.Println(req_id, "End DATA")
 
 	// Generate delay
 	delay := time.Millisecond * time.Duration(WAIT+rand.Intn(500))
@@ -78,4 +79,5 @@ func hello_json(w http.ResponseWriter, r *http.Request) {
 	// generate web response
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
+	log.Println(req_id, "END request")
 }

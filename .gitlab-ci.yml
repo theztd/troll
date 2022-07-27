@@ -1,0 +1,69 @@
+stages:
+- test
+- build
+- public
+- release
+
+
+prepare:
+  image: golang:latest
+  stage: test
+  script:
+    - go fmt $(go list ./...)
+    - go vet $(go list ./...)
+    - go test -race $(go list ./...)
+
+
+build:
+  stage: build
+  image: golang:latest
+  script:
+  - export BINARY_NAME=troll
+  - mkdir $CI_PROJECT_DIR/build/
+  - GOOS=linux GOARCH=amd64 go build -ldflags "-extldflags '-static'" -o $CI_PROJECT_DIR/build/${BINARY_NAME}-linux-amd64
+  - GOOS=linux GOARCH=arm64 go build -ldflags "-extldflags '-static'" -o $CI_PROJECT_DIR/build/${BINARY_NAME}-linux-arm64
+  - GOOS=darwin GOARCH=amd64 go build -ldflags "-extldflags '-static'" -o $CI_PROJECT_DIR/build/${BINARY_NAME}-darwin-amd64
+  - GOOS=darwin GOARCH=arm64 go build -ldflags "-extldflags '-static'" -o $CI_PROJECT_DIR/build/${BINARY_NAME}-darwin-arm64
+  artifacts:
+    paths:
+      - build
+
+
+public:
+  stage: public
+  script:
+    - export VERSION=$(grep VERSION version.go | cut -d\" -f2)
+    - export BINARY_NAME=troll
+    - ls $CI_PROJECT_DIR/build
+    - | 
+      for arch in linux-amd64 linux-arm64 darwin-amd64 darwin-arm64; do
+        echo "Uploading file $CI_PROJECT_DIR/build/${BINARY_NAME}-${arch}"
+        curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file $CI_PROJECT_DIR/build/${BINARY_NAME}-${arch} "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${BINARY_NAME}/${VERSION}-${arch}/${BINARY_NAME}"
+      done
+
+
+release_job:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG                  # Run this job when a tag is created manually
+  script:
+    - echo "running release_job"
+  release:
+    name: 'Release $CI_COMMIT_TAG'
+    description: 'Created using the release-cli $EXTRA_DESCRIPTION'  # $EXTRA_DESCRIPTION must be defined
+    tag_name: '$CI_COMMIT_TAG'                                       # elsewhere in the pipeline.
+    ref: '$CI_COMMIT_TAG'
+    milestones:
+      - 'm1'
+      - 'm2'
+      - 'm3'
+    # released_at: '2020-07-15T08:00:00Z'  # Optional, is auto generated if not defined, or can use a variable.
+    assets: # Optional, multiple asset links
+      links:
+        - name: 'asset1'
+          url: 'https://example.com/assets/1'
+        - name: 'asset2'
+          url: 'https://example.com/assets/2'
+          filepath: '/pretty/url/1' # optional
+          link_type: 'other' # optional% 
