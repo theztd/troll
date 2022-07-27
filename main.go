@@ -12,13 +12,18 @@ import (
 )
 
 func main() {
+	// declare arguments
 	flag.StringVar(&NAME, "name", "troll", "Define custom application name")
 	flag.IntVar(&WAIT, "wait", 0, "Minimal wait time before each request")
 	flag.StringVar(&DOC_ROOT, "root", "./public", "Define document root for serving files")
-
 	flag.Parse()
 
-	log.Println("Starting web server ", VERSION)
+	// it is better to be configurable via env
+	PORT = getEnv("PORT", ":8080")
+
+	log.Println("Starting web server", VERSION)
+	log.Println(" - listen on port: ", PORT)
+	log.Println("")
 
 	// name := flag.String("name", "goapi")
 
@@ -29,5 +34,9 @@ func main() {
 
 	http.Handle("/", router)
 
-	log.Fatal(http.ListenAndServe(getEnv("PORT", ":8080"), nil))
+	log.Println("Ready for connections...")
+
+	log.Fatal(http.ListenAndServe(PORT, nil))
+
+	log.Println("Server is down...")
 }
