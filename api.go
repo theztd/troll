@@ -1,37 +1,54 @@
 package main
 
 import (
-	"io"
-	"log"
+	"fmt"
+	"io/ioutil"
+	"math/rand"
 	"net/http"
+	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-contrib/requestid"
+	"github.com/gin-gonic/gin"
 )
 
-type Endpoint struct {
-	Path     string
-	Method   string
-	Code     int
-	Response string
+func slowResponse(c *gin.Context) {
+
+	// make response randomly slower
+	delay := time.Millisecond * time.Duration(WAIT+rand.Intn(500))
+	time.Sleep(delay)
+
+	data, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Println(string(data))
+
+	c.JSON(http.StatusOK, gin.H{
+		"item":         c.Param("item"),
+		"id":           c.Param("id"),
+		"reqId":        requestid.Get(c),
+		"delay":        delay,
+		"receivedData": string(data),
+	})
 }
 
-func DynamicRouter(configFile string) {
-	r := mux.NewRouter()
-	log.Panicln("Loading config file " + configFile)
+func getRoutes() {
+	/*
+		Build routes tree
+	*/
 
-	conf := []Endpoint{
-		{"/status", "GET", 200, "Application is up and running"},
-		{"/info", "GET", 200, "Latest version of the application"},
-	}
+	/*
+		Please check
+		https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies
+		for details.
 
-	for _, endpoint := range conf {
-		log.Println("INIT: prepare route" + endpoint.Path)
-		route := endpoint
-		r.HandleFunc(route.Path, func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			log.Println("INFO: Requested url " + route.Path + "from " + r.RemoteAddr)
-			w.WriteHeader(route.Code)
-			io.WriteString(w, route.Response)
-		}).Methods(route.Method)
-	}
+	*/
+	// router.TrustedPlatform = "X-CDN-IP"
+	// router.SetTrustedProxies([]string{"127.0.0.1"})
+
+	v1 := router.Group("v1")
+	v1RoutesAdd(v1)
+
+	v2 := router.Group("v2")
+	v2RoutesAdd(v2)
+
+	//plain := router.Group("plain")
+
 }

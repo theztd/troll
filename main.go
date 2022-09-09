@@ -5,10 +5,6 @@ package main
 
 import (
 	"flag"
-	"log"
-	"net/http"
-
-	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -19,26 +15,9 @@ func main() {
 	flag.Parse()
 
 	// it is better to be configurable via env
-	PORT = getEnv("PORT", ":8080")
+	ADDRESS = getEnv("ADDRESS", ":8080")
 
-	log.Println("Starting web server", VERSION)
-	log.Println(" - listen on port: ", PORT)
-	log.Println("")
-
-	// name := flag.String("name", "goapi")
-
-	router := mux.NewRouter()
-
-	router.HandleFunc("/{url:.*}.json", hello_json)
-	router.HandleFunc("/{url:.*}", hello_txt)
-
-	//router.PathPrefix("/v1/").Handler(DynamicRouter("path_to_the_file.yaml"))
-
-	http.Handle("/", router)
-
-	log.Println("Ready for connections...")
-
-	log.Fatal(http.ListenAndServe(PORT, nil))
-
-	log.Println("Server is down...")
+	// It is enought
+	getRoutes()
+	router.Run(ADDRESS)
 }
