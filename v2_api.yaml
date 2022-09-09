@@ -11,6 +11,10 @@ endpoints:
   method: GET
   code: 200
   response: "We have plenty of machines in our factory as you can see as follows..."
+- path: /machines/add
+  method: POST
+  code: 200
+  response: "New machine has been added"
 - path: /buildings
   method: GET
   code: 200
