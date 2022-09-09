@@ -10,3 +10,4 @@ var NAME string
 var DOC_ROOT string
 var WAIT int = 0
 var ADDRESS string
+var V2_PATH string

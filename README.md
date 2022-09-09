@@ -26,9 +26,30 @@ troll -help
         Define document root for serving files (default "./public")
   -wait int
         Minimal wait time before each request
+      
+  -v2-path string
+        Path to the yaml with custom api definition, example format is in part custom API definition
 
 ```
 
 ### Listen port
 
 Application accept env PORT and the default value is **:8080**
+
+
+### Custom API definition
+
+By editing v2_api.yaml you can change /v2 endpoints and his responses (return code including).
+
+The default structure is:
+```yaml
+---
+name: Inventory
+description: Our company inventory includes employees and equipment
+version: 2022-02-09
+endpoints:
+- path: /employee
+  method: GET
+  code: 200
+  response: "List of our employee..."
+```

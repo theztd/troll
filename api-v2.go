@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
@@ -42,8 +43,6 @@ func v2RoutesAdd(rtG *gin.RouterGroup) {
 	r := rtG.Group("/")
 	log.Println("Loading V2 routes...")
 
-	cfg := loadYaml("./api_example.yaml")
-
 	r.Use(requestid.New())
 
 	r.GET("/info", func(c *gin.Context) {
@@ -57,23 +56,24 @@ func v2RoutesAdd(rtG *gin.RouterGroup) {
 		})
 	})
 
-	/*
-		cfg := []Endpoint{
-			{"/users", 200, "list of all users"},
-			{"/machines", 200, "list of the all machines in our factory"},
-		}
-	*/
-	for _, x := range cfg.Endpoints {
-		r.GET(x.Path, func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"version":    "0.0.1",
-				"app_name":   "troll-dymanic-api",
-				"client_ip":  c.ClientIP(),
-				"referer":    c.Request.Referer(),
-				"user-agent": c.Request.UserAgent(),
-				"reqId":      requestid.Get(c),
-				"msg":        x.Response,
+	// if v2 yaml configuration exists, generate endpoints
+	if _, err := os.Stat(V2_PATH); err == nil {
+		cfg := loadYaml(V2_PATH)
+
+		for _, x := range cfg.Endpoints {
+			r.GET(x.Path, func(c *gin.Context) {
+				c.JSON(http.StatusOK, gin.H{
+					"version":    "0.0.1",
+					"app_name":   "troll-dymanic-api",
+					"client_ip":  c.ClientIP(),
+					"referer":    c.Request.Referer(),
+					"user-agent": c.Request.UserAgent(),
+					"reqId":      requestid.Get(c),
+					"msg":        x.Response,
+				})
 			})
-		})
+		}
+	} else {
+		log.Println("ERR: Unable to find file " + V2_PATH)
 	}
 }
