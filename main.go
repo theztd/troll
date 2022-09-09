@@ -32,6 +32,8 @@ func main() {
 	router.HandleFunc("/{url:.*}.json", hello_json)
 	router.HandleFunc("/{url:.*}", hello_txt)
 
+	//router.PathPrefix("/v1/").Handler(DynamicRouter("path_to_the_file.yaml"))
+
 	http.Handle("/", router)
 
 	log.Println("Ready for connections...")
