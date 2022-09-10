@@ -1,2 +1,4 @@
 troll*
 build/*
+coverage.txt
+.vscode/*

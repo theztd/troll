@@ -5,16 +5,24 @@ stages:
 - release
 
 
-prepare:
+Run tests:
   image: golang:latest
   stage: test
   script:
     - go fmt $(go list ./...)
     - go vet $(go list ./...)
     - go test -race $(go list ./...)
+    - go test . -coverprofile=coverage.txt -covermode count
+    - go get github.com/boumenot/gocover-cobertura
+    - go run github.com/boumenot/gocover-cobertura < coverage.txt > coverage.xml
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
 
 
-build:
+Build:
   stage: build
   image: golang:latest
   script:
@@ -29,7 +37,7 @@ build:
       - build
 
 
-public:
+Public:
   stage: public
   script:
     - export VERSION=$(grep VERSION version.go | cut -d\" -f2)
@@ -42,7 +50,7 @@ public:
       done
 
 
-release_job:
+Release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
