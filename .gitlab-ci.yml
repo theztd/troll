@@ -52,35 +52,28 @@ Public:
         curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file $CI_PROJECT_DIR/build/${BINARY_NAME}-${arch} "${PACKAGE_REGISTRY_URL}/${BINARY_NAME}-linux-amd64"
       done
 
+
 Release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
     - if: $CI_COMMIT_TAG
-  script:
-    - |
-      release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG \
-        --assets-link "{\"name\":\"${DARWIN_AMD64_BINARY}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${DARWIN_AMD64_BINARY}\"}" \
-        --assets-link "{\"name\":\"${LINUX_AMD64_BINARY}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${LINUX_AMD64_BINARY}\"}"
-
-Release latest:
-  stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  when: manual
   script:
     - export VERSION=$(grep VERSION variables.go | cut -d\" -f2)
     - |
-      release-cli create --name "Release LATEST from master branch" --tag-name ${VERSION} \
+      release-cli create --name "Release ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
         --assets-link "{\"name\":\"${BINARY_NAME}-darwin-arm64\",\"url\":\"${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${BINARY_NAME}/${VERSION}-darwin-arm64/${BINARY_NAME}\"}" \
         --assets-link "{\"name\":\"${BINARY_NAME}-linux-amd64\",\"url\":\"${PACKAGE_REGISTRY_URL}/${BINARY_NAME}-linux-amd64\"}"
 
 
-Release OLD:
+Release NEW:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
     - if: $CI_COMMIT_TAG                  # Run this job when a tag is created manually
   script:
-    - echo "running release_job"
+    - export EXTRA_DESCRIPTION="My custom release notes. Maybe I will generate it..."
   release:
     name: 'Release $CI_COMMIT_TAG'
     description: 'Created using the release-cli $EXTRA_DESCRIPTION'  # $EXTRA_DESCRIPTION must be defined
@@ -93,9 +86,7 @@ Release OLD:
     # released_at: '2020-07-15T08:00:00Z'  # Optional, is auto generated if not defined, or can use a variable.
     assets: # Optional, multiple asset links
       links:
-        - name: 'asset1'
-          url: 'https://example.com/assets/1'
-        - name: 'asset2'
-          url: 'https://example.com/assets/2'
-          filepath: '/pretty/url/1' # optional
-          link_type: 'other' # optional% 
+        - name: ${BINARY_NAME}-darwin-arm64
+          url: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${BINARY_NAME}/${VERSION}-darwin-arm64/${BINARY_NAME}
+        - name: ${BINARY_NAME}-linux-amd64
+          url: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${BINARY_NAME}/${VERSION}-linux-amd64/${BINARY_NAME} 
