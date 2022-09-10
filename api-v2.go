@@ -40,22 +40,46 @@ func loadYaml(path string) YamlStruct {
 	return data
 }
 
+func v2Status(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"msg":   "pong",
+		"reqId": requestid.Get(c),
+	})
+}
+
+func v2Info(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"version":    "0.1.1",
+		"app_name":   "troll",
+		"client_ip":  c.ClientIP(),
+		"referer":    c.Request.Referer(),
+		"user-agent": c.Request.UserAgent(),
+		"reqId":      requestid.Get(c),
+	})
+}
+
+func commonGet(c *gin.Context, x Endpoint) {
+	c.JSON(http.StatusOK, gin.H{
+		"reqId": requestid.Get(c),
+		"msg":   x.Response,
+	})
+}
+
+func commonPost(c *gin.Context, x Endpoint) {
+	c.JSON(http.StatusOK, gin.H{
+		"reqId": requestid.Get(c),
+		"msg":   x.Response,
+	})
+}
+
 func v2RoutesAdd(rtG *gin.RouterGroup) {
 	r := rtG.Group("/")
 	log.Println("Loading V2 routes...")
 
 	r.Use(requestid.New())
 
-	r.GET("/info", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"version":    "0.0.1",
-			"app_name":   "troll-dymanic-api",
-			"client_ip":  c.ClientIP(),
-			"referer":    c.Request.Referer(),
-			"user-agent": c.Request.UserAgent(),
-			"reqId":      requestid.Get(c),
-		})
-	})
+	r.GET("/info", v2Info)
+	r.GET("/status", v2Status)
 
 	// if v2 yaml configuration exists, generate endpoints
 	if _, err := os.Stat(V2_PATH); err == nil {
@@ -67,26 +91,16 @@ func v2RoutesAdd(rtG *gin.RouterGroup) {
 			case "GET":
 				r.GET(x.Path, func(c *gin.Context) {
 					c.JSON(http.StatusOK, gin.H{
-						"version":    "0.0.1",
-						"app_name":   "troll-dymanic-api",
-						"client_ip":  c.ClientIP(),
-						"referer":    c.Request.Referer(),
-						"user-agent": c.Request.UserAgent(),
-						"reqId":      requestid.Get(c),
-						"msg":        x.Response,
+						"reqId": requestid.Get(c),
+						"msg":   x.Response,
 					})
 				})
 
 			case "POST":
 				r.POST(x.Path, func(c *gin.Context) {
 					c.JSON(http.StatusOK, gin.H{
-						"version":    "0.0.1",
-						"app_name":   "troll-dymanic-api",
-						"client_ip":  c.ClientIP(),
-						"referer":    c.Request.Referer(),
-						"user-agent": c.Request.UserAgent(),
-						"reqId":      requestid.Get(c),
-						"msg":        x.Response,
+						"reqId": requestid.Get(c),
+						"msg":   x.Response,
 					})
 				})
 

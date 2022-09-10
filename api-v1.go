@@ -22,11 +22,29 @@ func slowResponse(c *gin.Context) {
 	fmt.Println(string(data))
 
 	c.JSON(http.StatusOK, gin.H{
-		"item":         c.Param("item"),
-		"id":           c.Param("id"),
-		"reqId":        requestid.Get(c),
-		"delay":        delay,
-		"receivedData": string(data),
+		"item":  c.Param("item"),
+		"id":    c.Param("id"),
+		"reqId": requestid.Get(c),
+		"delay": delay,
+		//"receivedData": string(data),
+	})
+}
+
+func v1Status(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"msg":   "pong",
+		"reqId": requestid.Get(c),
+	})
+}
+
+func v1Info(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"version":    "0.1.1",
+		"app_name":   "troll",
+		"client_ip":  c.ClientIP(),
+		"referer":    c.Request.Referer(),
+		"user-agent": c.Request.UserAgent(),
+		"reqId":      requestid.Get(c),
 	})
 }
 
@@ -36,24 +54,8 @@ func v1RoutesAdd(rtG *gin.RouterGroup) {
 
 	r.Use(requestid.New())
 
-	r.GET("/status", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"msg":   "pong",
-			"reqId": requestid.Get(c),
-		})
-	})
-
-	r.GET("/info", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"version":    "0.1.1",
-			"app_name":   "troll",
-			"client_ip":  c.ClientIP(),
-			"referer":    c.Request.Referer(),
-			"user-agent": c.Request.UserAgent(),
-			"reqId":      requestid.Get(c),
-		})
-	})
-
+	r.GET("/status", v1Status)
+	r.GET("/info", v1Info)
 	r.GET("/:item/*id", slowResponse)
 	r.POST("/:item/*id", slowResponse)
 }
