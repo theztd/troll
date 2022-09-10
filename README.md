@@ -1,28 +1,24 @@
-[![pipeline status](https://gitlab.com/theztd/troll/badges/main/pipeline.svg)](https://gitlab.com/theztd/troll/-/commits/main)
-
-[![coverage report](https://gitlab.com/theztd/troll/badges/main/coverage.svg)](https://gitlab.com/theztd/troll/-/commits/main)
-
-[![Go Report Card](https://goreportcard.com/badge/gitlab.com/theztd/troll?style=flat-square)](https://goreportcard.com/report/gitlab.com/theztd/troll)
-
-[![Latest Release](https://gitlab.com/theztd/troll/-/badges/release.svg)](https://gitlab.com/theztd/troll/-/releases)
-
-
 # Troll
 
-Is a very simple webserver returning response.
+[![pipeline status](https://gitlab.com/theztd/troll/badges/main/pipeline.svg)](https://gitlab.com/theztd/troll/-/commits/main)   [![coverage report](https://gitlab.com/theztd/troll/badges/main/coverage.svg)](https://gitlab.com/theztd/troll/-/commits/main)   
+[![Go Report Card](https://goreportcard.com/badge/gitlab.com/theztd/troll?style=flat-square)](https://goreportcard.com/report/gitlab.com/theztd/troll)   [![Latest Release](https://gitlab.com/theztd/troll/-/badges/release.svg)](https://gitlab.com/theztd/troll/-/releases)
 
+Troll is a very simple webserver returning defined response with configurable delay and a few more features.
 
 ## Purpouse
+ * Testing API endpoint (configurable via YAML).
+ * Responding with random predefined delay.
+ * Serve static files from FS.
+ * Ready to use API backend for FE app prototyping.
+ * Demo CI/CD with GOlang application
 
-Testing API endpoint, responding with random predefined delay on all paths... 
-
-### Features:
- * define minimal wait interval for response
- * define document root for serving static content
- * aplication name could be defined
- * listen port could be set via ENV
- * print received json data to log and respond in json
- * log with basic request_id
+## Features:
+ * Define minimal wait interval for response
+ * Define document root for serving static content
+ * Aplication name could be defined
+ * Listen port could be set via ENV
+ * Print received json data to log and respond in json
+ * Log with basic request_id
  
 ## RUN
 
@@ -62,3 +58,4 @@ endpoints:
   code: 200
   response: "List of our employee..."
 ```
+
