@@ -70,7 +70,7 @@ Release latest:
     - |
       export VERSION=$(grep VERSION version.go | cut -d\" -f2)
       release-cli create --name "Release LATEST from master branch" --tag-name latest \
-        --assets-link "{\"name\":\"${BINARY_NAME}-darwin-arm64\",\"url\":\"${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${BINARY_NAME}/${VERSION}-darwin-arm64/${BINARY_NAME}" \
+        --assets-link "{\"name\":\"${BINARY_NAME}-darwin-arm64\",\"url\":\"${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${BINARY_NAME}/${VERSION}-darwin-arm64/${BINARY_NAME}\" \
         --assets-link "{\"name\":\"${BINARY_NAME}-linux-amd64\",\"url\":\"${PACKAGE_REGISTRY_URL}/${BINARY_NAME}-linux-amd64\"}"
 
 
