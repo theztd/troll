@@ -50,6 +50,7 @@ Public:
       for arch in linux-amd64 linux-arm64 darwin-amd64 darwin-arm64; do
         echo "Uploading file $CI_PROJECT_DIR/build/${BINARY_NAME}-${arch}"
         curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file $CI_PROJECT_DIR/build/${BINARY_NAME}-${arch} "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${BINARY_NAME}/${VERSION}-${arch}/${BINARY_NAME}"
+        curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file $CI_PROJECT_DIR/build/${BINARY_NAME}-${arch} "${PACKAGE_REGISTRY_URL}/${BINARY_NAME}-linux-amd64"
       done
 
 Release:
@@ -69,7 +70,7 @@ Release latest:
   script:
     - |
       release-cli create --name "Release LATEST from master branch" --tag-name latest \
-        --assets-link "{\"name\":\"${BINARY_NAME}-darwin-arm64\",\"url\":\"${PACKAGE_REGISTRY_URL}/${BINARY_NAME}-darwin-arm64\"}" \
+        --assets-link "{\"name\":\"${BINARY_NAME}-darwin-arm64\",\"url\":\"${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${BINARY_NAME}/${VERSION}-darwin-arm64/${BINARY_NAME}" \
         --assets-link "{\"name\":\"${BINARY_NAME}-linux-amd64\",\"url\":\"${PACKAGE_REGISTRY_URL}/${BINARY_NAME}-linux-amd64\"}"
 
 
