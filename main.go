@@ -5,6 +5,9 @@ package main
 
 import (
 	"flag"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -35,6 +38,15 @@ func getRoutes() {
 
 	// register static dir
 	router.Static("/public", DOC_ROOT)
+	router.Static("/assets", "./assets")
+	router.LoadHTMLGlob("templates/*.html")
+
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{
+			"title":   "Troll",
+			"message": "Application that helps you with mocking, generating slow responses etc.",
+		})
+	})
 
 	v1 := router.Group("v1")
 	v1RoutesAdd(v1)
