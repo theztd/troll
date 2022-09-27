@@ -1,30 +1,34 @@
+# You can override the included template(s) by including variable overrides
+# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
+# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
+# Container Scanning customization: https://docs.gitlab.com/ee/user/application_security/container_scanning/#customizing-the-container-scanning-settings
+# Note that environment variables can be set in several places
+# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 stages:
 - test
 - build
 - public
 - release
-
 variables:
   BINARY_NAME: troll
   PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/troll/${PACKAGE_VERSION}"
-
 
 Run tests:
   image: golang:latest
   stage: test
   script:
-    - go fmt $(go list ./...)
-    - go vet $(go list ./...)
-    - go test -race $(go list ./...)
-    - go test . -coverprofile=coverage.txt -covermode count
-    - go get github.com/boumenot/gocover-cobertura
-    - go run github.com/boumenot/gocover-cobertura < coverage.txt > coverage.xml
+  - go fmt $(go list ./...)
+  - go vet $(go list ./...)
+  - go test -race $(go list ./...)
+  - go test . -coverprofile=coverage.txt -covermode count
+  - go get github.com/boumenot/gocover-cobertura
+  - go run github.com/boumenot/gocover-cobertura < coverage.txt > coverage.xml
   artifacts:
     reports:
       coverage_report:
         coverage_format: cobertura
         path: coverage.xml
-
 
 Build:
   stage: build
@@ -37,8 +41,7 @@ Build:
   - GOOS=darwin GOARCH=arm64 go build -ldflags "-extldflags '-static'" -o $CI_PROJECT_DIR/build/${BINARY_NAME}-darwin-arm64
   artifacts:
     paths:
-      - build
-
+    - build
 
 Public:
   stage: public
@@ -52,41 +55,54 @@ Public:
         curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file $CI_PROJECT_DIR/build/${BINARY_NAME}-${arch} "${PACKAGE_REGISTRY_URL}/${BINARY_NAME}-linux-amd64"
       done
 
-
 Release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
-    - if: $CI_COMMIT_TAG
-  when: manual
+  - if: "$CI_COMMIT_TAG"
+  script:
+  - |
+    release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG \
+      --assets-link "{\"name\":\"${DARWIN_AMD64_BINARY}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${DARWIN_AMD64_BINARY}\"}" \
+      --assets-link "{\"name\":\"${LINUX_AMD64_BINARY}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${LINUX_AMD64_BINARY}\"}"
+
+Release latest:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
     - export VERSION=$(grep VERSION variables.go | cut -d\" -f2)
     - |
-      release-cli create --name "Release ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
+      release-cli create --name "Release LATEST from master branch" --tag-name ${VERSION} \
         --assets-link "{\"name\":\"${BINARY_NAME}-darwin-arm64\",\"url\":\"${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${BINARY_NAME}/${VERSION}-darwin-arm64/${BINARY_NAME}\"}" \
         --assets-link "{\"name\":\"${BINARY_NAME}-linux-amd64\",\"url\":\"${PACKAGE_REGISTRY_URL}/${BINARY_NAME}-linux-amd64\"}"
 
 
-Release NEW:
+Release OLD:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
-    - if: $CI_COMMIT_TAG                  # Run this job when a tag is created manually
+  - if: "$CI_COMMIT_TAG"
   script:
-    - export EXTRA_DESCRIPTION="My custom release notes. Maybe I will generate it..."
+  - echo "running release_job"
   release:
-    name: 'Release $CI_COMMIT_TAG'
-    description: 'Created using the release-cli $EXTRA_DESCRIPTION'  # $EXTRA_DESCRIPTION must be defined
-    tag_name: '$CI_COMMIT_TAG'                                       # elsewhere in the pipeline.
-    ref: '$CI_COMMIT_TAG'
-    # milestones:
-    #   - 'm1'
-    #   - 'm2'
-    #   - 'm3'
-    # released_at: '2020-07-15T08:00:00Z'  # Optional, is auto generated if not defined, or can use a variable.
-    assets: # Optional, multiple asset links
+    name: Release $CI_COMMIT_TAG
+    description: Created using the release-cli $EXTRA_DESCRIPTION
+    tag_name: "$CI_COMMIT_TAG"
+    ref: "$CI_COMMIT_TAG"
+    milestones:
+    - m1
+    - m2
+    - m3
+    assets:
       links:
-        - name: ${BINARY_NAME}-darwin-arm64
-          url: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${BINARY_NAME}/${VERSION}-darwin-arm64/${BINARY_NAME}
-        - name: ${BINARY_NAME}-linux-amd64
-          url: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${BINARY_NAME}/${VERSION}-linux-amd64/${BINARY_NAME} 
+      - name: asset1
+        url: https://example.com/assets/1
+      - name: asset2
+        url: https://example.com/assets/2
+        filepath: "/pretty/url/1"
+        link_type: other
+
+sast:
+  stage: test
+include:
+- template: Security/SAST.gitlab-ci.yml
