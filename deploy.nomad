@@ -39,7 +39,7 @@ job "__JOB_NAME__" {
             check {
                 name = "${NOMAD_JOB_NAME} - alive"
                 type = "http"
-                path = "/__health.json"
+                path = "/v1/status"
                 interval = "1m"
                 timeout = "10s"
 
@@ -54,19 +54,21 @@ job "__JOB_NAME__" {
          }
 
         task "app" {
-          /*
+          
           driver = "docker"
 
           config {
             image = var.image
             force_pull = true
-            ports = ["api"]
+            
+            ports = ["app"]
+
             labels {
               group = "app"
             }
           }
-          */
-
+          
+          /*
           driver = "exec"
 
           config {
@@ -82,9 +84,10 @@ job "__JOB_NAME__" {
               checksum = "sha256:1b29427d34564b1ad14f7486577b0b94221dc07d2dfc92dbb942bd1d74d339ad"
             }
           }
+          */
 
           env {
-            PORT = ":8080"
+            ADDRESS = ":8080"
           }
 
           resources {
