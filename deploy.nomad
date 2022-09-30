@@ -8,13 +8,13 @@ variable "dcs" {
   default = ["dc1", "devel"]
 }
 
-/*
+
 variable "image" {
   type = string
 }
-*/
 
-job "troll" {
+
+job "__JOB_NAME__" {
     datacenters = var.dcs
 
     group "fe" {
