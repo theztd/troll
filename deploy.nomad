@@ -30,8 +30,8 @@ job "__JOB_NAME__" {
             tags = [
                 "public",
                 "traefik.enable=true",
-                "traefik.http.routers.${NOMAD_JOB_NAME}-http.rule=Host(`${var.fqdn}`)",
-                "traefik.http.routers.${NOMAD_JOB_NAME}-http.tls=true"
+                "traefik.http.routers.${NOMAD_JOB_NAME}-http.rule=Host(`${var.fqdn}`)"
+                //"traefik.http.routers.${NOMAD_JOB_NAME}-http.tls=true"
             ]
 
             port = "app"
