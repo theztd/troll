@@ -38,7 +38,7 @@ func getRoutes() {
 
 	// register static dir
 	router.Static("/public", DOC_ROOT)
-	router.Static("/assets", "./assets")
+	router.Static("/static", "./static")
 	router.LoadHTMLGlob("templates/*.html")
 
 	router.GET("/", func(c *gin.Context) {
