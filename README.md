@@ -10,6 +10,7 @@
 [![Build and deploj](https://github.com/theztd/troll/actions/workflows/build_and_deploy.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/build_and_deploy.yml)
 [![Release Go project](https://github.com/theztd/troll/actions/workflows/release.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/release.yml)
 
+
 Troll is a very simple webserver returning defined response with configurable delay and a few more features.
 
 ## Purpouse
