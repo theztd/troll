@@ -21,6 +21,8 @@ job "__JOB_NAME__" {
     count = 1
 
     network {
+      mode = "bridge"
+      
       port "app" { to = 8080 }
       port "http" { to = 80 }
     }
