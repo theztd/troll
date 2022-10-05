@@ -35,7 +35,7 @@ jobs:
 
           # On master don't add the prefix
           export BRANCH="${GITHUB_REF#refs/*/}"
-          if [[ "$BRANCH" == "master" ]]; then
+          if [[ "$BRANCH" == "main" ]]; then
             export PREFIX=""
           else
             export PREFIX=$(echo "${BRANCH}-" | sed 's/_/-/g')
