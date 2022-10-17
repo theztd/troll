@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httputil"
+	"strconv"
 	"strings"
 	"time"
 
@@ -15,9 +16,10 @@ import (
 )
 
 func slowResponse(c *gin.Context) {
+	wait, _ := strconv.Atoi(c.Query("wait"))
 
 	// make response randomly slower
-	delay := time.Millisecond * time.Duration(WAIT+rand.Intn(500))
+	delay := time.Millisecond * time.Duration(WAIT+rand.Intn(500+wait))
 	time.Sleep(delay)
 
 	data, _ := ioutil.ReadAll(c.Request.Body)
