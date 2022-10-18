@@ -19,8 +19,8 @@ func slowResponse(c *gin.Context) {
 	wait, _ := strconv.Atoi(c.Query("wait"))
 
 	// make response randomly slower
-	delay := time.Millisecond * time.Duration(WAIT+rand.Intn(500+wait))
-	time.Sleep(delay)
+	delay := time.Millisecond * time.Duration(WAIT+rand.Intn(500))
+	time.Sleep(delay + time.Duration(wait))
 
 	data, _ := ioutil.ReadAll(c.Request.Body)
 	fmt.Println(string(data))
