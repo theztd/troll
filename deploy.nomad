@@ -22,6 +22,10 @@ job "__JOB_NAME__" {
 
     network {
       mode = "bridge"
+
+      dns {
+        servers = ["172.17.0.1", "8.8.8.8", "1.1.1.1"]
+      }
       
       port "app" { to = 8080 }
       port "http" { to = 80 }
@@ -119,26 +123,9 @@ job "__JOB_NAME__" {
         }
       }
 
-      /*
-          driver = "exec"
-
-          config {
-            command = "download"
-            args = [
-                "-name", "troll-1"
-            ]
-          }
-
-          artifact {
-            source = "https://gitlab.com/theztd/troll/-/package_files/47459529/download"
-            options {
-              checksum = "sha256:1b29427d34564b1ad14f7486577b0b94221dc07d2dfc92dbb942bd1d74d339ad"
-            }
-          }
-          */
-
       env {
         ADDRESS = ":8080"
+        WAIT = 100
       }
 
       resources {
@@ -147,7 +134,8 @@ job "__JOB_NAME__" {
         memory_max = 96
       }
 
-    }
+    } # END task app
+
 
   } # END group FE
 

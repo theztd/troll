@@ -27,6 +27,7 @@ Troll is a very simple webserver returning defined response with configurable de
  * Listen port could be set via ENV
  * Print received json data to log and respond in json
  * Log with basic request_id
+ * Request dumping 404 page
  
 ## RUN
 
