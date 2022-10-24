@@ -19,8 +19,9 @@ func slowResponse(c *gin.Context) {
 	wait, _ := strconv.Atoi(c.Query("wait"))
 
 	// make response randomly slower
-	delay := time.Millisecond * time.Duration(WAIT+rand.Intn(500))
-	time.Sleep(delay + time.Duration(wait))
+	delay := (time.Duration(WAIT+rand.Intn(500)) * time.Millisecond) + time.Duration(wait)*time.Millisecond
+	time.Sleep(delay)
+	fmt.Println(delay)
 
 	data, _ := ioutil.ReadAll(c.Request.Body)
 	fmt.Println(string(data))
@@ -60,6 +61,14 @@ func v1AllHeaders(c *gin.Context) {
 	})
 }
 
+func dumpRequest(c *gin.Context) {
+	reqDump, _ := httputil.DumpRequest(c.Request, true)
+	fmt.Println(string(reqDump))
+	c.HTML(http.StatusNotFound, "404.html", gin.H{
+		"message": "You are looking for something what we are looking for too... Contact us and lets try to find it together :-)",
+	})
+}
+
 func v1RoutesAdd(rtG *gin.RouterGroup) {
 	r := rtG.Group("/")
 	log.Println("Loading V1 routes...")
@@ -71,4 +80,5 @@ func v1RoutesAdd(rtG *gin.RouterGroup) {
 	r.GET("/headers", v1AllHeaders)
 	r.GET("/:item/*id", slowResponse)
 	r.POST("/:item/*id", slowResponse)
+	r.GET("/404", dumpRequest)
 }
