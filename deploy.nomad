@@ -1,10 +1,10 @@
 variable "fqdn" {
-  type = string
+  type    = string
   default = "troll.fejk.net"
 }
 
 variable "dcs" {
-  type = list(string)
+  type    = list(string)
   default = ["dc1", "devel"]
 }
 
@@ -15,60 +15,111 @@ variable "image" {
 
 
 job "__JOB_NAME__" {
-    datacenters = var.dcs
+  datacenters = var.dcs
 
-    group "fe" {
-        count = 1
+  group "fe" {
+    count = 1
 
-        network {
-            port "app" { to = 8080 }
+    network {
+      mode = "bridge"
+      
+      port "app" { to = 8080 }
+      port "http" { to = 80 }
+    }
+
+    service {
+      name = "${JOB}-http"
+
+      tags = [
+        "public",
+        "traefik.enable=true",
+        "traefik.http.routers.${NOMAD_JOB_NAME}-http.rule=Host(`http-${var.fqdn}`)"
+        //"traefik.http.routers.${NOMAD_JOB_NAME}-http.tls=true"
+      ]
+
+      port = "http"
+    }
+
+    service {
+      name = "${JOB}-app"
+
+      tags = [
+        "public",
+        "traefik.enable=true",
+        "traefik.http.routers.${NOMAD_JOB_NAME}-app.rule=Host(`${var.fqdn}`)"
+        //"traefik.http.routers.${NOMAD_JOB_NAME}-http.tls=true"
+      ]
+
+      port = "app"
+
+      check {
+        name     = "${NOMAD_JOB_NAME} - alive"
+        type     = "http"
+        path     = "/v1/status"
+        interval = "1m"
+        timeout  = "10s"
+
+        # Task should run 2m after deployment
+        check_restart {
+          limit           = 5
+          grace           = "2m"
+          ignore_warnings = true
         }
+      }
 
-        service {
-            name = "${JOB}-http"
+    }
 
-            tags = [
-                "public",
-                "traefik.enable=true",
-                "traefik.http.routers.${NOMAD_JOB_NAME}-http.rule=Host(`${var.fqdn}`)"
-                //"traefik.http.routers.${NOMAD_JOB_NAME}-http.tls=true"
-            ]
+    task "nginx" {
+      driver = "docker"
 
-            port = "app"
+      config {
+        image = "nginx:1.21"
 
-            check {
-                name = "${NOMAD_JOB_NAME} - alive"
-                type = "http"
-                path = "/v1/status"
-                interval = "1m"
-                timeout = "10s"
+        volumes = [
+          "local:/etc/nginx/conf.d",
+        ]
 
-                # Task should run 2m after deployment
-                check_restart {
-                    limit = 5
-                    grace = "2m"
-                    ignore_warnings = true
-                }
-            }
+        ports = ["http"]
+      }
 
-         }
+      template {
+        destination = "local/default.conf"
+        perms       = "644"
+        data        = file("nginx.conf")
+      }
 
-        task "app" {
-          
-          driver = "docker"
+      # Resources:    https://www.nomadproject.io/docs/job-specification/resources
+      resources {
+        cpu        = 100 # MHz
+        memory     = 16  # MB
+        memory_max = 64  #MB
+      }
 
-          config {
-            image = var.image
-            force_pull = true
-            
-            ports = ["app"]
 
-            labels {
-              group = "app"
-            }
-          }
-          
-          /*
+      kill_timeout = "10s"
+    }
+    # END NGinx task
+
+
+
+
+
+    task "app" {
+
+      driver = "docker"
+
+      config {
+        image      = var.image
+        force_pull = true
+
+        ports = ["app"]
+
+        labels {
+          group = "app"
+        }
+      }
+
+      /*
           driver = "exec"
 
           config {
@@ -86,18 +137,18 @@ job "__JOB_NAME__" {
           }
           */
 
-          env {
-            ADDRESS = ":8080"
-          }
+      env {
+        ADDRESS = ":8080"
+      }
 
-          resources {
-            cpu = 100
-            memory = 64
-            memory_max = 96
-          }
+      resources {
+        cpu        = 100
+        memory     = 64
+        memory_max = 96
+      }
 
-        }
+    }
 
-    } # END group FE
+  } # END group FE
 
 }

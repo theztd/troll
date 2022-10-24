@@ -48,6 +48,8 @@ func getRoutes() {
 		})
 	})
 
+	router.GET("/404", dumpRequest)
+
 	v1 := router.Group("v1")
 	v1RoutesAdd(v1)
 
