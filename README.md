@@ -27,23 +27,27 @@ Troll is a very simple webserver returning defined response with configurable de
  * Listen port could be set via ENV
  * Print received json data to log and respond in json
  * Log with basic request_id
- * Request dumping 404 page
+ * 404 page dumping request to log
+ * Generate 503 randomly (simulate errors)
+ * Fill RAM with each request (simulate mem leaks)
  
 ## RUN
 
 ```bash
 troll -help
 
+  -fail int
+        Returns 503. Set 1 - 10, where 10 = 100% error rate.
+  -fill-ram int
+        Fill ram with each request. Set number in bytes.
   -name string
         Define custom application name (default "troll")
   -root string
         Define document root for serving files (default "./public")
+  -v2-path string
+        Define path to v2 api endpoint configuration yaml (default "./v2_api.yaml")
   -wait int
         Minimal wait time before each request
-      
-  -v2-path string
-        Path to the yaml with custom api definition, example format is in part custom API definition
-
 ```
 
 ### Listen port
