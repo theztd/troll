@@ -83,6 +83,7 @@ func MidlewareChaos() gin.HandlerFunc {
 			Simulate broken application using RAM
 		*/
 		if FILL_RAM > 0 {
+			fmt.Println("INFO: Filling memmory, because you set it by option -fill-ram")
 			overflow := make([]byte, 1024*1024*FILL_RAM)
 			for i := 0; i < len(overflow); i += 1024 {
 				overflow[i] = byte(i / 42)
@@ -102,7 +103,7 @@ func MidlewareChaos() gin.HandlerFunc {
 		if rand.Intn(10) < FAIL_FREQ {
 
 			c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{
-				"message": "Troll is NOT able handle this request",
+				"message": "Troll generates random error, because option -fail has been set. Disable it if you don't wnat to see this error again.",
 				"status":  503,
 			})
 		}
