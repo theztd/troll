@@ -33,12 +33,13 @@ job "__JOB_NAME__" {
 
     service {
       name = "${JOB}-http"
+      provider = "nomad"
 
       tags = [
         "public",
         "traefik.enable=true",
         "traefik.http.routers.${NOMAD_JOB_NAME}-http.rule=Host(`http-${var.fqdn}`)"
-        //"traefik.http.routers.${NOMAD_JOB_NAME}-http.tls=true"
+        "traefik.http.routers.${NOMAD_JOB_NAME}-http.tls=true"
       ]
 
       port = "http"
@@ -46,12 +47,13 @@ job "__JOB_NAME__" {
 
     service {
       name = "${JOB}-app"
+      provider = "nomad"
 
       tags = [
         "public",
         "traefik.enable=true",
         "traefik.http.routers.${NOMAD_JOB_NAME}-app.rule=Host(`${var.fqdn}`)"
-        //"traefik.http.routers.${NOMAD_JOB_NAME}-http.tls=true"
+        "traefik.http.routers.${NOMAD_JOB_NAME}-http.tls=true"
       ]
 
       port = "app"
