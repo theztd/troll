@@ -16,6 +16,13 @@ variable "image" {
 
 job "__JOB_NAME__" {
   datacenters = var.dcs
+  
+  meta {
+    fqdn = var.fqdn
+    git = "github.com/theztd/troll"
+    managed = "github-pipeline"
+    image = var.image
+  }
 
   group "fe" {
     count = 1
@@ -38,7 +45,7 @@ job "__JOB_NAME__" {
       tags = [
         "public",
         "traefik.enable=true",
-        "traefik.http.routers.${NOMAD_JOB_NAME}-http.rule=Host(`http-${var.fqdn}`)"
+        "traefik.http.routers.${NOMAD_JOB_NAME}-http.rule=Host(`http-${var.fqdn}`)",
         "traefik.http.routers.${NOMAD_JOB_NAME}-http.tls=true"
       ]
 
@@ -52,7 +59,7 @@ job "__JOB_NAME__" {
       tags = [
         "public",
         "traefik.enable=true",
-        "traefik.http.routers.${NOMAD_JOB_NAME}-app.rule=Host(`${var.fqdn}`)"
+        "traefik.http.routers.${NOMAD_JOB_NAME}-app.rule=Host(`${var.fqdn}`)",
         "traefik.http.routers.${NOMAD_JOB_NAME}-http.tls=true"
       ]
 
