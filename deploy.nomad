@@ -11,6 +11,7 @@ variable "dcs" {
 
 variable "image" {
   type = string
+  default = "ghcr.io/theztd/troll:main"
 }
 
 
@@ -76,7 +77,6 @@ job "__JOB_NAME__" {
         check_restart {
           limit           = 5
           grace           = "2m"
-          ignore_warnings = true
         }
       }
 
