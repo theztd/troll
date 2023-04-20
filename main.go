@@ -1,5 +1,5 @@
 /*
-  Hello world web application (example)
+Hello world web application (example)
 */
 package main
 
@@ -26,9 +26,26 @@ func main() {
 
 	// it is better to be configurable via env
 	ADDRESS = getEnv("ADDRESS", ":8080")
+	LOG_LEVEL = getEnv("LOG_LEVEL", "info")
 
 	// It is enought
 	getRoutes()
+
+	// _healthz routes
+	router.GET("/_healthz/ready.json", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{
+			"status":  "pass",
+			"version": VERSION,
+			"notes":   "Troll is a very simple webserver returning defined response with configurable delay and a few more features.",
+		})
+	})
+
+	// router.GET("/_healthz/status.json", HealthDetail)
+
+	// get global Monitor object
+	m.SetMetricPath("/_healthz/metrics")
+	m.Use(router)
+
 	router.Run(ADDRESS)
 }
 
@@ -60,9 +77,11 @@ func getRoutes() {
 	router.NoRoute(dumpRequest)
 
 	v1 := router.Group("v1")
+	m.Use(v1)
 	v1RoutesAdd(v1)
 
 	v2 := router.Group("v2")
+	m.Use(v2)
 	v2RoutesAdd(v2)
 
 }

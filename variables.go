@@ -1,11 +1,16 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/penglongli/gin-metrics/ginmetrics"
+)
 
 // globally available
 var router = gin.Default()
+var m = ginmetrics.GetMonitor()
 
 var VERSION string = "1.0.0"
+var LOG_LEVEL string
 var NAME string
 var DOC_ROOT string
 var WAIT int = 0
