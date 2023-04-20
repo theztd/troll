@@ -9,7 +9,7 @@ import (
 var router = gin.Default()
 var m = ginmetrics.GetMonitor()
 
-var VERSION string = "1.0.0"
+var VERSION string = "1.1.2"
 var LOG_LEVEL string
 var NAME string
 var DOC_ROOT string
