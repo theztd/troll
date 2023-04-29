@@ -36,21 +36,6 @@ job "__JOB_NAME__" {
       }
       
       port "app" { to = 8080 }
-      port "http" { to = 80 }
-    }
-
-    service {
-      name = "${JOB}-http"
-      provider = "nomad"
-
-      tags = [
-        "public",
-        "traefik.enable=true",
-        "traefik.http.routers.${NOMAD_JOB_NAME}-http.rule=Host(`http-${var.fqdn}`)",
-        "traefik.http.routers.${NOMAD_JOB_NAME}-http.tls=true"
-      ]
-
-      port = "http"
     }
 
     service {
@@ -61,7 +46,7 @@ job "__JOB_NAME__" {
         "public",
         "traefik.enable=true",
         "traefik.http.routers.${NOMAD_JOB_NAME}-app.rule=Host(`${var.fqdn}`)",
-        "traefik.http.routers.${NOMAD_JOB_NAME}-http.tls=true"
+        "traefik.http.routers.${NOMAD_JOB_NAME}-app.tls=true"
       ]
 
       port = "app"
@@ -81,40 +66,6 @@ job "__JOB_NAME__" {
       }
 
     }
-
-    task "nginx" {
-      driver = "docker"
-
-      config {
-        image = "nginx:1.21"
-
-        volumes = [
-          "local:/etc/nginx/conf.d",
-        ]
-
-        ports = ["http"]
-      }
-
-      template {
-        destination = "local/default.conf"
-        perms       = "644"
-        data        = file("nginx.conf")
-      }
-
-      # Resources:    https://www.nomadproject.io/docs/job-specification/resources
-      resources {
-        cpu        = 100 # MHz
-        memory     = 16  # MB
-        memory_max = 64  #MB
-      }
-
-
-      kill_timeout = "10s"
-    }
-    # END NGinx task
-
-
-
 
 
     task "app" {
