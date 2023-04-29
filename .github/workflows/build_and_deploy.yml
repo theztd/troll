@@ -9,6 +9,7 @@ env:
   IMAGE: ghcr.io/${{ github.repository }}
   FQDN: troll.fejk.net
   JOB_NAME: troll
+  GIT_SSL_NO_VERIFY: 1
 
 jobs:
   build-and-push-image:
