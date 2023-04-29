@@ -89,6 +89,7 @@ jobs:
     - name: Prepare JOB template
       shell: bash
       run: |
+        export NOMAD_SKIP_VERIFY="true"
         # Generate job name from branch and job
         export MY_JOB_NAME=${GITHUB_REF#refs/*/}-${JOB_NAME}
 
