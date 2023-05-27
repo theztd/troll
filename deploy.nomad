@@ -43,10 +43,10 @@ job "__JOB_NAME__" {
       provider = "nomad"
 
       tags = [
+				"webapp",
         "public",
         "traefik.enable=true",
-        "traefik.http.routers.${NOMAD_JOB_NAME}-app.rule=Host(`${var.fqdn}`)",
-        "traefik.http.routers.${NOMAD_JOB_NAME}-app.tls=true"
+        "traefik.http.routers.${NOMAD_JOB_NAME}-app.rule=Host(`${var.fqdn}`)"
       ]
 
       port = "app"
