@@ -43,7 +43,8 @@ job "__JOB_NAME__" {
       provider = "nomad"
 
       tags = [
-				"webapp",
+        "metrics=true",
+        "metrics.path=/_healthz/metrics",
         "public",
         "traefik.enable=true",
         "traefik.http.routers.${NOMAD_JOB_NAME}-app.rule=Host(`${var.fqdn}`)"
