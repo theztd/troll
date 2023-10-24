@@ -4,6 +4,7 @@ Hello world web application (example)
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"math/rand"
@@ -13,6 +14,24 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+func jsonLoggerMiddleware() gin.HandlerFunc {
+	return gin.LoggerWithFormatter(
+		func(params gin.LogFormatterParams) string {
+			log := make(map[string]interface{})
+
+			log["status_code"] = params.StatusCode
+			log["path"] = params.Path
+			log["method"] = params.Method
+			log["start_time"] = params.TimeStamp.Format("2006/01/02 - 15:04:05")
+			log["remote_addr"] = params.ClientIP
+			log["response_time"] = params.Latency.String()
+
+			s, _ := json.Marshal(log)
+			return string(s) + "\n"
+		},
+	)
+}
 
 func main() {
 	// declare arguments
@@ -71,6 +90,12 @@ func getRoutes() {
 			"title":   "Troll",
 			"message": "Application that helps you with mocking, generating slow responses etc.",
 		})
+	})
+
+	// Websockets endpoint
+	router.GET("/ws", wsTime)
+	router.GET("/websocket", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "ws.html", nil)
 	})
 
 	// define default for not found

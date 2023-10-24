@@ -6,7 +6,7 @@ import (
 )
 
 // globally available
-var router = gin.Default()
+var router = gin.New()
 var m = ginmetrics.GetMonitor()
 
 var VERSION string = "1.1.2"

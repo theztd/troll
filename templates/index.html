@@ -9,7 +9,7 @@
         }
         
         .container {
-            padding: 10px;
+            padding: 25px 10px;
             margin: 50px auto;
             width: 500px;
             height: 400px;
@@ -24,7 +24,9 @@
     <body>
         <div class="container">
             <h1>{{ .title }}</h1>
-
+            <nav>
+                <a href="/websocket">Test websockets</a>
+            </nav>
             <img src="/static/troll.svg" width="50%" height="50%">
             <p>{{ .message }}</p>
         </div>
