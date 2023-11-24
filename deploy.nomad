@@ -45,9 +45,8 @@ job "__JOB_NAME__" {
       tags = [
         "metrics=true",
         "metrics.path=/_healthz/metrics",
-        "public",
-        "traefik.enable=true",
-        "traefik.http.routers.${NOMAD_JOB_NAME}-app.rule=Host(`${var.fqdn}`)"
+        "http=true",
+        "http.url=${var.fqdn}"
       ]
 
       port = "app"

@@ -1,5 +1,5 @@
 ## Build
-FROM golang:1.21-buster AS build
+FROM golang:1.21.4-bookworm AS build
 
 
 COPY . /usr/src/troll/
