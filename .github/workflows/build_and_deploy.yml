@@ -76,7 +76,7 @@ jobs:
     needs: build-and-push-image
     runs-on: ubuntu-latest
     container:
-      image: "fejk/nomad-ci:1.4.3"
+      image: "fejk/nomad-ci:1.6.3"
     steps:
     - uses: actions/checkout@v2
       with:
