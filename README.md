@@ -45,6 +45,7 @@ Troll is a very simple webserver returning defined response with configurable de
  * 404 page dumping request to log
  * Generate 503 randomly (simulate errors)
  * Fill RAM with each request (simulate mem leaks)
+ * Ready delay for testing canary releases and readyness check
 
 ## Build
 
@@ -58,17 +59,19 @@ env GOOS=target-OS GOARCH=target-architecture go build .
 troll -help
 
   -fail int
-        Returns 503. Set 1 - 10, where 10 = 100% error rate.
+    	Returns 503. Set 1 - 10, where 10 = 100% error rate.
   -fill-ram int
-        Fill ram with each request. Set number in bytes.
+    	Fill ram with each request. Set number in bytes.
   -name string
-        Define custom application name (default "troll")
+    	Define custom application name (default "troll")
+  -ready-delay int
+    	Simulate long application init (seconds).
   -root string
-        Define document root for serving files (default "./public")
+    	Define document root for serving files (default "./public")
   -v2-path string
-        Define path to v2 api endpoint configuration yaml (default "./v2_api.yaml")
+    	Define path to v2 api endpoint configuration yaml (default "./v2_api.yaml")
   -wait int
-        Minimal wait time before each request
+    	Minimal wait time before each request
 ```
 
 ## Config

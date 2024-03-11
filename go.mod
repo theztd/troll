@@ -1,6 +1,6 @@
 module gitlab.com/theztd/troll
 
-go 1.17
+go 1.22
 
 require (
 	github.com/gin-contrib/requestid v0.0.5
