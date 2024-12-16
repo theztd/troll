@@ -60,7 +60,35 @@ func main() {
 	}
 
 	// It is enought
-	getRoutes()
+	router := setRoutes()
+
+	router.Run(ADDRESS)
+}
+
+func setRoutes() *gin.Engine {
+	/*
+		Please check
+		https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies
+		for details.
+
+	*/
+	// router.TrustedPlatform = "X-CDN-IP"
+	// router.SetTrustedProxies([]string{"127.0.0.1"})
+
+	router := gin.New()
+	router.Use(MidlewareChaos())
+
+	// register static dir
+	router.Static("/public", DOC_ROOT)
+	router.Static("/static", "./static")
+	router.LoadHTMLGlob("templates/*.html")
+
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{
+			"title":   "Troll",
+			"message": "Application that helps you with mocking, generating slow responses etc.",
+		})
+	})
 
 	// _healthz routes
 	router.GET("/_healthz/ready.json", func(ctx *gin.Context) {
@@ -76,33 +104,6 @@ func main() {
 	// get global Monitor object
 	m.SetMetricPath("/_healthz/metrics")
 	m.Use(router)
-
-	router.Run(ADDRESS)
-}
-
-func getRoutes() {
-	/*
-		Please check
-		https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies
-		for details.
-
-	*/
-	// router.TrustedPlatform = "X-CDN-IP"
-	// router.SetTrustedProxies([]string{"127.0.0.1"})
-
-	router.Use(MidlewareChaos())
-
-	// register static dir
-	router.Static("/public", DOC_ROOT)
-	router.Static("/static", "./static")
-	router.LoadHTMLGlob("templates/*.html")
-
-	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", gin.H{
-			"title":   "Troll",
-			"message": "Application that helps you with mocking, generating slow responses etc.",
-		})
-	})
 
 	// Websockets endpoint
 	router.GET("/ws", wsTime)
@@ -121,6 +122,7 @@ func getRoutes() {
 	m.Use(v2)
 	v2RoutesAdd(v2)
 
+	return router
 }
 
 func dumpRequest(c *gin.Context) {

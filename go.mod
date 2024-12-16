@@ -5,7 +5,6 @@ go 1.22
 require (
 	github.com/gin-contrib/requestid v0.0.5
 	github.com/gin-gonic/gin v1.8.1
-	github.com/go-playground/assert/v2 v2.0.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/penglongli/gin-metrics v0.1.10
 	gopkg.in/yaml.v3 v3.0.1

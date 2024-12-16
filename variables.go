@@ -1,12 +1,11 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/penglongli/gin-metrics/ginmetrics"
 )
 
 // globally available
-var router = gin.New()
+
 var m = ginmetrics.GetMonitor()
 
 var VERSION string = "1.2.0"
