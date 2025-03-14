@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "Helm/**"
+      - ".github/workflows/release_helm.yml"
 
 jobs:
   helm-charts-releaser:
