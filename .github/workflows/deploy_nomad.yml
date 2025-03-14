@@ -1,0 +1,74 @@
+
+name: Nomad deploy
+
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE: ghcr.io/${{ github.repository }}
+  FQDN: troll.fejk.net
+  JOB_NAME: troll
+  GIT_SSL_NO_VERIFY: 1
+
+jobs:  
+  nomad_deploy:
+    #runs-on: self-hosted
+    needs: build-and-push-image
+    runs-on: ubuntu-latest
+    container:
+      image: "fejk/nomad-ci:1.6.3"
+    steps:
+    - uses: actions/checkout@v2
+      with:
+          fetch-depth: 0
+
+    - uses: actions/download-artifact@v4
+      with:
+        name: deploy_vars
+
+    - name: Prepare JOB template
+      shell: bash
+      run: |
+        export NOMAD_SKIP_VERIFY="true"
+        # Generate job name from branch and job
+        export MY_JOB_NAME=${GITHUB_REF#refs/*/}-${JOB_NAME}
+
+        cat deploy.nomad | sed "s/__JOB_NAME__/${MY_JOB_NAME}/g" > my_deploy.nomad
+
+        cat my_deploy.nomad
+
+
+    - name: Plan JOB
+      shell: bash
+      run: |
+        export NOMAD_SKIP_VERIFY=true
+
+        # Test
+        cat var.tf
+
+        # Plan job
+
+        nomad plan -var-file var.tf my_deploy.nomad || true
+        
+
+      env:
+        NOMAD_ADDR: ${{ secrets.NOMAD_ADDR }}
+        NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN }}
+    
+    - name: Deploy JOB
+      run: |
+        export NOMAD_SKIP_VERIFY=true
+        
+        # Deploy job
+        nomad run -var-file var.tf my_deploy.nomad
+
+        # Print information, where the application should run
+        echo "deploy image ${IMAGE}:${GITHUB_SHA} to ${PREFIX}${FQDN}"
+
+        # Test
+        echo ":boom: Deploy has been finished!!! :boom:" >> $GITHUB_STEP_SUMMARY
+
+      env:
+        NOMAD_ADDR: ${{ secrets.NOMAD_ADDR }}
+        NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN }}
