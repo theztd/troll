@@ -1,6 +1,6 @@
 apiVersion: v2
 name: troll
-description: Troll is an example application
+description: Troll is an example application usefull for infrastructure testing
 type: application
-version: 0.1.1
+version: 0.1.2
 appVersion: "1.2.0"
