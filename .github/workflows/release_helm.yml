@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "Helm"
+      - "Helm/**"
 
 jobs:
   helm-charts-releaser:
