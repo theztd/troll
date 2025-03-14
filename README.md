@@ -5,10 +5,10 @@
 [![pipeline status](https://gitlab.com/theztd/troll/badges/main/pipeline.svg)](https://gitlab.com/theztd/troll/-/commits/main)   [![coverage report](https://gitlab.com/theztd/troll/badges/main/coverage.svg)](https://gitlab.com/theztd/troll/-/commits/main)   
 [![Go Report Card](https://goreportcard.com/badge/gitlab.com/theztd/troll?style=flat-square)](https://goreportcard.com/report/gitlab.com/theztd/troll)   [![Latest Release](https://gitlab.com/theztd/troll/-/badges/release.svg)](https://gitlab.com/theztd/troll/-/releases)
 
-
 ### Github badges
 [![Build and deploj](https://github.com/theztd/troll/actions/workflows/build_and_deploy.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/build_and_deploy.yml)
 [![Release Go project](https://github.com/theztd/troll/actions/workflows/release.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/release.yml)
+[![Helm charts releaser](https://github.com/theztd/troll/actions/workflows/release_helm.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/release_helm.yml)
 
 
 Troll is a very simple webserver returning defined response with configurable delay and a few more features.
