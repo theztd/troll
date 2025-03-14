@@ -66,7 +66,7 @@ jobs:
           echo ":rocket: Depolyed app will be available soon there" >> $GITHUB_STEP_SUMMARY
           echo "## ${PREFIX}${FQDN}" >> $GITHUB_STEP_SUMMARY
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: deploy_vars
           path: ./var.tf
@@ -82,7 +82,7 @@ jobs:
       with:
           fetch-depth: 0
 
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
         name: deploy_vars
 
