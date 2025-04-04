@@ -37,12 +37,12 @@ jobs:
         with:
             platforms: linux/amd64, linux/arm64
             push: true
-            tags: ${{IMAGE}}:${{ github.ref_name }}-${{ github.sha }}
+            tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}-${{ github.sha }}
             
       - name: COPY CONTAINER IMAGE NAME
         run: |
           echo "## :whale: There are available new images:" >> $GITHUB_STEP_SUMMARY
-          echo "  - ${{IMAGE}}:${{ github.ref_name }}-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "  - ghcr.io/${{ github.repository }}:${{ github.ref_name }}-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
 
