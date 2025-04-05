@@ -45,6 +45,7 @@ Troll is a very simple webserver returning defined response with configurable de
  * 404 page dumping request to log
  * Generate 503 randomly (simulate errors)
  * Fill RAM with each request (simulate mem leaks)
+ * Generate CPU load on requests with ?heavy=cpu param
  * Ready delay for testing canary releases and readyness check
 
 ## Build

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"net/http/httputil"
@@ -150,6 +151,22 @@ func MidlewareChaos() gin.HandlerFunc {
 			for i := 0; i < len(overflow); i += 1024 {
 				overflow[i] = byte(i % 102)
 			}
+
+		}
+
+		if c.DefaultQuery("heavy", "") == "cpu" {
+			// Simulate CPU heavy task
+			log.Println("INFO: Generating high CPU load due to ?heavy=cpu")
+			done := make(chan bool)
+			go func() {
+				// Simulate CPU load for 1 seconds
+				end := time.Now().Add(1 * time.Second)
+				for time.Now().Before(end) {
+					_ = rand.Intn(1000) * rand.Intn(1000) // Perform random calculations
+				}
+				done <- true
+			}()
+			<-done
 
 		}
 
