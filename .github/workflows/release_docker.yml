@@ -1,4 +1,4 @@
-name: Build app and release docker image
+name: Build and release docker image
 
 on:
   push:
@@ -31,13 +31,26 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Extract git metadata
+        id: vars
+        run: |
+          echo "BRANCH_NAME=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "GIT_TAG=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+          fi
         
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
             platforms: linux/amd64, linux/arm64
             push: true
-            tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}-${{ github.sha }}
+            tags: |
+              ghcr.io/${{ github.repository }}:${{ github.ref_name }}-${{ github.sha }}
+              ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.BRANCH_NAME }}
+              ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.BRANCH_NAME }}-${{ steps.vars.outputs.SHORT_SHA }}
+              ${{ steps.vars.outputs.GIT_TAG && format('ghcr.io/{0}:{1}-{2}', ${{ github.repository }}, steps.vars.outputs.BRANCH_NAME, steps.vars.outputs.GIT_TAG) }}
             
       - name: COPY CONTAINER IMAGE NAME
         run: |
