@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"math/rand"
 	"net/http"
@@ -23,7 +23,7 @@ func slowResponse(c *gin.Context) {
 	time.Sleep(delay)
 	fmt.Println(delay)
 
-	data, _ := ioutil.ReadAll(c.Request.Body)
+	data, _ := io.ReadAll(c.Request.Body)
 	fmt.Println(string(data))
 
 	c.JSON(http.StatusOK, gin.H{
