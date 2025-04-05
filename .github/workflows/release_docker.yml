@@ -1,8 +1,13 @@
 name: Build and release docker image
 
 on:
+  schedule:
+    - cron: "0 23 * * 1"
   push:
-#    branches: ['release']
+    branches:
+      - "**"
+    tags:
+      - "v*.*.*"
 
 env:
   REGISTRY: ghcr.io
@@ -32,31 +37,35 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Extract git metadata
-        id: vars
-        run: |
-          echo "BRANCH_NAME=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
-          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            echo "GIT_TAG=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
-          fi
+      - name: Docker meta
+        # save the env to meta tag
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ghcr.io/${{ github.repository }}
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=${{ github.ref_name }}-${{ github.sha }}
+
         
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
             platforms: linux/amd64, linux/arm64
             push: true
-            tags: |
-              ghcr.io/${{ github.repository }}:${{ github.ref_name }}-${{ github.sha }}
-              ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.BRANCH_NAME }}
-              ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.BRANCH_NAME }}-${{ steps.vars.outputs.SHORT_SHA }}
-              ${{ steps.vars.outputs.GIT_TAG && format('ghcr.io/{0}:{1}-{2}', ${{ github.repository }}, steps.vars.outputs.BRANCH_NAME, steps.vars.outputs.GIT_TAG) }}
-            
+            tags: ${{ steps.meta.outputs.tags }}
+            labels: ${{ steps.meta.outputs.labels }}
+
       - name: COPY CONTAINER IMAGE NAME
         run: |
           echo "## :whale: There are available new images:" >> $GITHUB_STEP_SUMMARY
-          echo "  - ghcr.io/${{ github.repository }}:${{ github.ref_name }}-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+
 
 
       # - name: Build and release image
