@@ -9,6 +9,7 @@ import (
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"gitlab.com/theztd/troll/internal/config"
+	"gitlab.com/theztd/troll/internal/handlers"
 	"gopkg.in/yaml.v3"
 )
 
@@ -41,24 +42,6 @@ func loadYaml(path string) YamlStruct {
 	return data
 }
 
-func getStatus(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"msg":   "pong",
-		"reqId": requestid.Get(c),
-	})
-}
-
-func getInfo(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"version":    "0.1.1",
-		"app_name":   "troll",
-		"client_ip":  c.ClientIP(),
-		"referer":    c.Request.Referer(),
-		"user-agent": c.Request.UserAgent(),
-		"reqId":      requestid.Get(c),
-	})
-}
-
 func commonGet(c *gin.Context, x Endpoint) {
 	c.JSON(http.StatusOK, gin.H{
 		"reqId": requestid.Get(c),
@@ -79,8 +62,8 @@ func RoutesAdd(rtG *gin.RouterGroup) {
 
 	r.Use(requestid.New())
 
-	r.GET("/info", getInfo)
-	r.GET("/status", getStatus)
+	r.GET("/info", handlers.GetInfo)
+	r.GET("/status", handlers.GetStatus)
 
 	// if v2 yaml configuration exists, generate endpoints
 	if _, err := os.Stat(config.V2_PATH); err == nil {

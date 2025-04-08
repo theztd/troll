@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func wsTime(ctx *gin.Context) {
+func WebsocketRoute(ctx *gin.Context) {
 	conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		log.Println("ERR:", err)

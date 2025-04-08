@@ -1,0 +1,11 @@
+builds:
+  - id: troll
+    main: ./cmd/troll
+    binary: troll
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
