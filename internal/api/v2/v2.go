@@ -1,4 +1,4 @@
-package main
+package v2
 
 import (
 	"io/ioutil"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
+	"gitlab.com/theztd/troll/internal/config"
 	"gopkg.in/yaml.v3"
 )
 
@@ -40,14 +41,14 @@ func loadYaml(path string) YamlStruct {
 	return data
 }
 
-func v2Status(c *gin.Context) {
+func getStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"msg":   "pong",
 		"reqId": requestid.Get(c),
 	})
 }
 
-func v2Info(c *gin.Context) {
+func getInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"version":    "0.1.1",
 		"app_name":   "troll",
@@ -72,18 +73,18 @@ func commonPost(c *gin.Context, x Endpoint) {
 	})
 }
 
-func v2RoutesAdd(rtG *gin.RouterGroup) {
+func RoutesAdd(rtG *gin.RouterGroup) {
 	r := rtG.Group("/")
 	log.Println("Loading V2 routes...")
 
 	r.Use(requestid.New())
 
-	r.GET("/info", v2Info)
-	r.GET("/status", v2Status)
+	r.GET("/info", getInfo)
+	r.GET("/status", getStatus)
 
 	// if v2 yaml configuration exists, generate endpoints
-	if _, err := os.Stat(V2_PATH); err == nil {
-		cfg := loadYaml(V2_PATH)
+	if _, err := os.Stat(config.V2_PATH); err == nil {
+		cfg := loadYaml(config.V2_PATH)
 
 		for _, x := range cfg.Endpoints {
 
@@ -110,6 +111,6 @@ func v2RoutesAdd(rtG *gin.RouterGroup) {
 			}
 		}
 	} else {
-		log.Println("ERR: Unable to find file " + V2_PATH)
+		log.Println("ERR: Unable to find file " + config.V2_PATH)
 	}
 }

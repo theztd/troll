@@ -1,4 +1,4 @@
-package main
+package v1
 
 import (
 	"fmt"
@@ -13,13 +13,14 @@ import (
 
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
+	"gitlab.com/theztd/troll/internal/config"
 )
 
 func slowResponse(c *gin.Context) {
 	wait, _ := strconv.Atoi(c.Query("wait"))
 
 	// make response randomly slower
-	delay := (time.Duration(WAIT+rand.Intn(500)) * time.Millisecond) + time.Duration(wait)*time.Millisecond
+	delay := (time.Duration(config.WAIT+rand.Intn(500)) * time.Millisecond) + time.Duration(wait)*time.Millisecond
 	time.Sleep(delay)
 	fmt.Println(delay)
 
@@ -35,14 +36,14 @@ func slowResponse(c *gin.Context) {
 	})
 }
 
-func v1Status(c *gin.Context) {
+func getStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"msg":   "pong",
 		"reqId": requestid.Get(c),
 	})
 }
 
-func v1Info(c *gin.Context) {
+func getInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"version":    "0.1.1",
 		"app_name":   "troll",
@@ -53,7 +54,7 @@ func v1Info(c *gin.Context) {
 	})
 }
 
-func v1AllHeaders(c *gin.Context) {
+func allHeaders(c *gin.Context) {
 	reqDump, _ := httputil.DumpRequest(c.Request, true)
 	fmt.Println(string(reqDump))
 	c.JSON(http.StatusOK, gin.H{
@@ -61,15 +62,15 @@ func v1AllHeaders(c *gin.Context) {
 	})
 }
 
-func v1RoutesAdd(rtG *gin.RouterGroup) {
+func RoutesAdd(rtG *gin.RouterGroup) {
 	r := rtG.Group("/")
 	log.Println("Loading V1 routes...")
 
 	r.Use(requestid.New())
 
-	r.GET("/status", v1Status)
-	r.GET("/info", v1Info)
-	r.GET("/headers", v1AllHeaders)
+	r.GET("/status", getStatus)
+	r.GET("/info", getInfo)
+	r.GET("/headers", allHeaders)
 	r.GET("/:item/*id", slowResponse)
 	r.POST("/:item/*id", slowResponse)
 }

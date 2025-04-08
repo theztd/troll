@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"github.com/penglongli/gin-metrics/ginmetrics"
@@ -6,7 +6,7 @@ import (
 
 // globally available
 
-var m = ginmetrics.GetMonitor()
+var Metrics = ginmetrics.GetMonitor()
 
 var VERSION string = "1.2.0"
 var LOG_LEVEL string

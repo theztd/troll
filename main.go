@@ -14,6 +14,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"gitlab.com/theztd/troll/internal/config"
+	apiV1 "gitlab.com/theztd/troll/internal/v1"
+	apiV2 "gitlab.com/theztd/troll/internal/v2"
 )
 
 func jsonLoggerMiddleware() gin.HandlerFunc {
@@ -36,23 +39,23 @@ func jsonLoggerMiddleware() gin.HandlerFunc {
 
 func main() {
 	// declare arguments
-	flag.StringVar(&NAME, "name", "troll", "Define custom application name")
-	flag.IntVar(&WAIT, "wait", 0, "Minimal wait time before each request")
-	flag.StringVar(&DOC_ROOT, "root", "./public", "Define document root for serving files")
-	flag.StringVar(&V2_PATH, "v2-path", "./v2_api.yaml", "Define path to v2 api endpoint configuration yaml")
-	flag.IntVar(&FAIL_FREQ, "fail", 0, "Returns 503. Set 1 - 10, where 10 = 100% error rate.")
-	flag.IntVar(&FILL_RAM, "fill-ram", 0, "Fill ram with each request. Set number in bytes.")
-	flag.IntVar(&READY_DELAY, "ready-delay", 0, "Simulate long application init (seconds).")
+	flag.StringVar(&config.NAME, "name", "troll", "Define custom application name")
+	flag.IntVar(&config.WAIT, "wait", 0, "Minimal wait time before each request")
+	flag.StringVar(&config.DOC_ROOT, "root", "./public", "Define document root for serving files")
+	flag.StringVar(&config.V2_PATH, "v2-path", "./v2_api.yaml", "Define path to v2 api endpoint configuration yaml")
+	flag.IntVar(&config.FAIL_FREQ, "fail", 0, "Returns 503. Set 1 - 10, where 10 = 100% error rate.")
+	flag.IntVar(&config.FILL_RAM, "fill-ram", 0, "Fill ram with each request. Set number in bytes.")
+	flag.IntVar(&config.READY_DELAY, "ready-delay", 0, "Simulate long application init (seconds).")
 
 	flag.Parse()
 
 	// it is better to be configurable via env
-	ADDRESS = getEnv("ADDRESS", ":8080")
-	LOG_LEVEL = getEnv("LOG_LEVEL", "info")
+	config.ADDRESS = getEnv("ADDRESS", ":8080")
+	config.LOG_LEVEL = getEnv("LOG_LEVEL", "info")
 
-	if READY_DELAY > 0 {
+	if config.READY_DELAY > 0 {
 		fmt.Printf("Application init")
-		for i := 0; i < READY_DELAY; i++ {
+		for i := 0; i < config.READY_DELAY; i++ {
 			time.Sleep(time.Duration(1 * time.Second))
 			fmt.Printf(".")
 		}
@@ -63,7 +66,7 @@ func main() {
 	// It is enought
 	router := setRoutes()
 
-	router.Run(ADDRESS)
+	router.Run(config.ADDRESS)
 }
 
 func setRoutes() *gin.Engine {
@@ -80,7 +83,7 @@ func setRoutes() *gin.Engine {
 	router.Use(MidlewareChaos())
 
 	// register static dir
-	router.Static("/public", DOC_ROOT)
+	router.Static("/public", config.DOC_ROOT)
 	router.Static("/static", "./static")
 	router.LoadHTMLGlob("templates/*.html")
 
@@ -95,7 +98,7 @@ func setRoutes() *gin.Engine {
 	router.GET("/_healthz/ready.json", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"status":  "pass",
-			"version": VERSION,
+			"version": config.VERSION,
 			"notes":   "Troll is a very simple webserver returning defined response with configurable delay and a few more features.",
 		})
 	})
@@ -103,8 +106,8 @@ func setRoutes() *gin.Engine {
 	// router.GET("/_healthz/status.json", HealthDetail)
 
 	// get global Monitor object
-	m.SetMetricPath("/_healthz/metrics")
-	m.Use(router)
+	config.Metrics.SetMetricPath("/_healthz/metrics")
+	config.Metrics.Use(router)
 
 	// Websockets endpoint
 	router.GET("/ws", wsTime)
@@ -116,12 +119,12 @@ func setRoutes() *gin.Engine {
 	router.NoRoute(dumpRequest)
 
 	v1 := router.Group("v1")
-	m.Use(v1)
-	v1RoutesAdd(v1)
+	config.Metrics.Use(v1)
+	apiV1.RoutesAdd(v1)
 
 	v2 := router.Group("v2")
-	m.Use(v2)
-	v2RoutesAdd(v2)
+	config.Metrics.Use(v2)
+	apiV2.RoutesAdd(v2)
 
 	return router
 }
@@ -141,9 +144,9 @@ func MidlewareChaos() gin.HandlerFunc {
 
 			Simulate broken application using RAM
 		*/
-		if FILL_RAM > 0 {
+		if config.FILL_RAM > 0 {
 			fmt.Println("INFO: Filling memmory, because you set it by option -fill-ram")
-			overflow := make([]byte, 1024*1024*FILL_RAM)
+			overflow := make([]byte, 1024*1024*config.FILL_RAM)
 			for i := 0; i < len(overflow); i += 1024 {
 				overflow[i] = byte(i / 42)
 			}
@@ -175,7 +178,7 @@ func MidlewareChaos() gin.HandlerFunc {
 
 			Higher FAIL_FREQ value means more errors
 		*/
-		if rand.Intn(10) < FAIL_FREQ {
+		if rand.Intn(10) < config.FAIL_FREQ {
 
 			c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{
 				"message": "Troll generates random error, because option -fail has been set. Disable it if you don't wnat to see this error again.",
