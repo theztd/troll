@@ -24,7 +24,7 @@ Troll is a very simple webserver returning defined response with configurable de
 
 **Quick Links**
 
- * [DEMO application (Try it!!!)](http://troll.fejk.net)
+ * [DEMO application (Try it!!!)](https://troll.fejk.net)
 
 
 

@@ -2,9 +2,7 @@
 .github/*
 .gitlab-ci.yml
 coverage.txt
-*nomad
+nomad/*
+Helm/*
 *.hcl
 Dockerfile
-nginx.conf
-service.yaml
-test.sh

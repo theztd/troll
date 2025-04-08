@@ -6,7 +6,7 @@ COPY . /usr/src/troll/
 
 WORKDIR /usr/src/troll
 
-RUN go build -o /usr/local/bin/troll
+RUN go build -o /usr/local/bin/troll cmd/troll/main.go
 
 
 ## Deploy
