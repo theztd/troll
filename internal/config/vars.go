@@ -8,7 +8,7 @@ import (
 
 var Metrics = ginmetrics.GetMonitor()
 
-var VERSION string = "1.3.0-dev4"
+var VERSION string = "1.4.0"
 var LOG_LEVEL string
 var NAME string
 var DOC_ROOT string
