@@ -1,14 +1,10 @@
 # Troll
 
 
-### Gitlab badges
-[![pipeline status](https://gitlab.com/theztd/troll/badges/main/pipeline.svg)](https://gitlab.com/theztd/troll/-/commits/main)   [![coverage report](https://gitlab.com/theztd/troll/badges/main/coverage.svg)](https://gitlab.com/theztd/troll/-/commits/main)   
-[![Go Report Card](https://goreportcard.com/badge/gitlab.com/theztd/troll?style=flat-square)](https://goreportcard.com/report/gitlab.com/theztd/troll)   [![Latest Release](https://gitlab.com/theztd/troll/-/badges/release.svg)](https://gitlab.com/theztd/troll/-/releases)
-
 ### Github badges
-[![Build and deploj](https://github.com/theztd/troll/actions/workflows/build_and_deploy.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/build_and_deploy.yml)
-[![Release Go project](https://github.com/theztd/troll/actions/workflows/release.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/release.yml)
+[![GO Release](https://github.com/theztd/troll/actions/workflows/release_golang.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/release_golang.yml)
 [![Helm charts releaser](https://github.com/theztd/troll/actions/workflows/release_helm.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/release_helm.yml)
+[![Build and release docker image](https://github.com/theztd/troll/actions/workflows/release_docker.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/release_docker.yml)
 
 
 Troll is a very simple webserver returning defined response with configurable delay and a few more features.
@@ -48,13 +44,13 @@ Troll is a very simple webserver returning defined response with configurable de
  * Generate CPU load on requests with ?heavy=cpu param
  * Ready delay for testing canary releases and readyness check
 
-## Build
+## 🧱 Build
 
 ```bash
-env GOOS=target-OS GOARCH=target-architecture go build .
+env GOOS=target-OS GOARCH=target-architecture go build -o troll cmd/troll/main.go
 ```
 
-## RUN
+## 🚀 RUN
 
 ```bash
 troll -help
@@ -86,7 +82,7 @@ Configuration is possible via ENV variables
 
 More options are posible via arguments. Configuration of v2 api is possible as follows... 
 
-### Custom API definition
+### 🤖 Custom API definition
 
 By editing v2_api.yaml you can change /v2 endpoints and his responses (return code including).
 
@@ -103,14 +99,14 @@ endpoints:
   response: "List of our employee..."
 ```
 
-### Dependencies
+### 🌿 Dependencies
 
  | Name | Url | Notes |
  |---|---|---|
  | FS:  | ./v2_api.yaml | v2 config file have to be available. |
  
 
-### Monitoring
+### 📈 Monitoring
 
 #### Health check example
  ```json
@@ -180,7 +176,7 @@ promhttp_metric_handler_requests_total{code="500"} 0
 promhttp_metric_handler_requests_total{code="503"} 0
 ```
 
-#### Logs
+#### 🔎 Logs
 
 Change log level by env LOG_LEVEL
 
@@ -196,3 +192,22 @@ Change log level by env LOG_LEVEL
 ### Backup
 
 * There is nothing to backup
+
+
+## Contribute
+
+Thank you for your interest in this project! Everyone is welcome to help.
+
+### ✅ Commit rules
+We use a simple commit style: type(scope): short message
+
+Here are the types you can use:
+
+| Type     | Description                        | Example Commit Message                         |
+|----------|------------------------------------|------------------------------------------------|
+| **feat** | New feature                        | feat(api): add /v2/status route              |
+| **fix**  | Small fix or bug fix               | fix(handler): check for nil input            |
+| **ref**  | Refactor (clean up or improve)     | ref(server): simplify router setup           |
+| **doc**  | Documentation                      | doc(readme): add build instructions          |
+| **ci**   | CI/CD or pipeline changes          | ci(k8s): append canary release ingress       |
+| **test** | Testing or temporary experiments   | test(api): log request body for debugging    |
