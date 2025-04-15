@@ -37,15 +37,7 @@ func InitRoutes() *gin.Engine {
 	})
 
 	// _healthz routes
-	router.GET("/_healthz/ready.json", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"status":  "pass",
-			"version": config.VERSION,
-			"notes":   "Troll is a very simple webserver returning defined response with configurable delay and a few more features.",
-		})
-	})
-
-	// router.GET("/_healthz/status.json", HealthDetail)
+	router.GET("/_healthz/ready.json", handlers.Ready)
 
 	// get global Monitor object
 	config.Metrics.SetMetricPath("/_healthz/metrics")

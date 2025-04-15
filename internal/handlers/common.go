@@ -33,6 +33,14 @@ func GetStatus(c *gin.Context) {
 	})
 }
 
+func Ready(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "pass",
+		"version": config.VERSION,
+		"notes":   "Troll is a very simple webserver returning defined response with configurable delay and a few more features.",
+	})
+}
+
 func GetAllHeaders(c *gin.Context) {
 	reqDump, _ := httputil.DumpRequest(c.Request, true)
 	fmt.Println(string(reqDump))

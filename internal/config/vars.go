@@ -18,3 +18,4 @@ var V2_PATH string
 var FAIL_FREQ int = 0
 var FILL_RAM int = 0
 var READY_DELAY int = 0
+var DSN string
