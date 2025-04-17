@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"time"
 
+	"math/rand/v2"
+
 	"github.com/gin-gonic/gin"
 	"gitlab.com/theztd/troll/internal/config"
-	"golang.org/x/exp/rand"
 )
 
 func Chaos() gin.HandlerFunc {
@@ -39,7 +40,7 @@ func Chaos() gin.HandlerFunc {
 				// Simulate CPU load for 1 seconds
 				end := time.Now().Add(1 * time.Second)
 				for time.Now().Before(end) {
-					_ = rand.Intn(1000) * rand.Intn(1000) // Perform random calculations
+					_ = rand.IntN(1000) * rand.IntN(1000) // Perform random calculations
 				}
 				done <- true
 			}()
@@ -52,7 +53,7 @@ func Chaos() gin.HandlerFunc {
 
 			Higher FAIL_FREQ value means more errors
 		*/
-		if rand.Intn(10) < config.FAIL_FREQ {
+		if rand.IntN(10) < config.FAIL_FREQ {
 
 			c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{
 				"message": "Troll generates random error, because option -fail has been set. Disable it if you don't wnat to see this error again.",
