@@ -9,9 +9,9 @@ import (
 )
 
 var BackendUrls = []string{
-	"http://service-a/api/info",
-	"http://service-b/api/info",
-	"http://service-c/api/info",
+	"http://service-a/v1/info",
+	"http://service-b/v1/info",
+	"http://service-c/v1/info",
 }
 
 const html_template = `
