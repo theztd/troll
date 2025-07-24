@@ -18,6 +18,7 @@ func RoutesAdd(rGroup *gin.RouterGroup) {
 
 	r.GET("/info", handlers.GetInfo)
 	r.GET("/status", handlers.GetStatus)
+	r.GET("/status/nice", handlers.StatusNice)
 	r.GET("/headers", handlers.GetAllHeaders)
 	r.GET("/slow/:item/*id", handlers.GetSlowResponse)
 	r.POST("/slow/:item/*id", handlers.GetSlowResponse)
