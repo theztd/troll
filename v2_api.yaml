@@ -3,23 +3,54 @@ name: Inventory
 description: Our company inventory includes employees and equipment
 version: 2022-09-09
 endpoints:
-- path: /users
-  method: GET
-  code: 200
-  response: "List of the all known users is bellow..."
 - path: /machines
+  kind: basic
   method: GET
   code: 200
   response: "We have plenty of machines in our factory as you can see as follows..."
 - path: /machines/add
+  kind: basic
   method: POST
   code: 200
   response: "New machine has been added"
 - path: /buildings
+  kind: basic
   method: GET
   code: 200
   response: "We have production and office buildings in many cities"
 - path: /customers
+  kind: basic
   method: GET
   code: 200
   response: "Our customers are listed there:"
+- path: /employee
+  kind: sql
+  method: GET
+  query: |
+    select
+      firstname, lastname, department, position 
+    from employee 
+    where 
+      firstname like '%' or lastname like '%' or department like '%';
+  args:
+  - firstname
+  - lastname
+  - department
+  response: |
+    {
+      'data': [
+    {% range . %}
+        {
+          'uid' : '{{ .uid }}',
+          'firstname': '{{ .firstname }}',
+          'lastname': '{{ .lastname }}',
+          'department': '{{ .department }}',
+          'position': '{{ .position }}'
+        }
+    {% end %}
+      ],
+      'result_code': '{{ .response_code }}'
+    }
+    
+
+

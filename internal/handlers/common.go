@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"strconv"
@@ -31,6 +32,18 @@ func GetStatus(c *gin.Context) {
 		"msg":   "pong",
 		"reqId": requestid.Get(c),
 	})
+}
+
+func Ready(c *gin.Context) {
+	log.Println("DEBUG [handler.Ready]: Processing.")
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "pass",
+		"version": config.VERSION,
+		"notes":   "Troll is a very simple webserver returning defined response with configurable delay and a few more features.",
+	})
+	if config.LOG_LEVEL == "debug" {
+		log.Println("DEBUG [handler.Ready]: Processed.")
+	}
 }
 
 func GetAllHeaders(c *gin.Context) {
