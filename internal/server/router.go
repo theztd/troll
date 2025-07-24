@@ -23,6 +23,7 @@ func InitRoutes() *gin.Engine {
 
 	router := gin.New()
 	router.Use(midleware.Chaos())
+	router.Use(midleware.ServerReceivedHeaders())
 
 	// register static dir
 	router.Static("/public", config.DOC_ROOT)

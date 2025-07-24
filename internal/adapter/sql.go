@@ -6,7 +6,11 @@ import (
 	"strings"
 	"time"
 
+	//_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
+
+	//	_ "github.com/mattn/go-sqlite3"
 	"gitlab.com/theztd/troll/internal/config"
 )
 
@@ -19,7 +23,7 @@ func getDriverNameFromDSN(dsn string) (string, error) {
 	case strings.HasPrefix(dsn, "sqlite://"):
 		return "sqlite", nil
 	default:
-		return "", fmt.Errorf("nepodporovaný DSN: %s", dsn)
+		return "", fmt.Errorf("ERR [getDriverNameFromDSN]: Unknown DSN: %s", dsn)
 	}
 }
 
@@ -48,30 +52,35 @@ func RunQuery(query string) (results []map[string]interface{}, err error) {
 	// log.Printf("DEBUG [RunQuery]: Query: %s\n", query)
 	driver, err := getDriverNameFromDSN(config.DSN)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("ERR [RunQuery]: Unable to parse DSN (%s). %v", config.DSN, err)
+		return nil, fmt.Errorf("unable to parse DSN (%s). %v", config.DSN, err)
 	}
 
 	db, err := sqlx.Connect(driver, config.DSN)
 	if err != nil {
-		log.Fatalf("ERR [RunQuery]: Chyba připojení k DB: %v", err)
+		log.Printf("ERR [RunQuery]: Unable to connect database. %v", err)
+		return nil, fmt.Errorf("unable to connect database. %v", err)
 	}
 	defer db.Close()
 
-	rows, err := db.Queryx("SELECT * from employee;")
+	rows, err := db.Queryx(query)
 	if err != nil {
-		log.Printf("ERR [RunQuery]: Chyba při dotazu: %v", err)
+		log.Printf("ERR [RunQuery]: Database query error. %v", err)
+		return nil, fmt.Errorf("database query error. %v", err)
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		row := make(map[string]interface{})
 		if err := rows.MapScan(row); err != nil {
-			log.Printf("ERR [RunQuery]: Chyba MapScan: %v", err)
+			log.Printf("WARN [RunQuery]: Skipping row due to MapScan error: %v", err)
 			continue
 		}
-		normalizedRow := NormalizeRow(row)
-		fmt.Printf("%#v\n", normalizedRow)
-		results = append(results, row)
+		results = append(results, NormalizeRow(row))
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("row iteration failed: %w", err)
 	}
 
 	return results, nil

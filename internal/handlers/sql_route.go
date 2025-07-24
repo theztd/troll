@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
-	adapter "gitlab.com/theztd/troll/internal/adapters"
+	adapter "gitlab.com/theztd/troll/internal/adapter"
 	"gitlab.com/theztd/troll/internal/config"
 )
 

@@ -28,7 +28,7 @@ endpoints:
   method: GET
   query: |
     select
-      uid, firstname, lastname, department, position 
+      firstname, lastname, department, position 
     from employee 
     where 
       firstname like '%' or lastname like '%' or department like '%';

@@ -18,6 +18,9 @@ func RoutesAdd(rGroup *gin.RouterGroup) {
 
 	r.GET("/info", handlers.GetInfo)
 	r.GET("/status", handlers.GetStatus)
+	r.GET("/headers", handlers.GetAllHeaders)
+	r.GET("/slow/:item/*id", handlers.GetSlowResponse)
+	r.POST("/slow/:item/*id", handlers.GetSlowResponse)
 
 	// if v2 yaml configuration exists, generate endpoints
 	if _, err := os.Stat(config.V2_PATH); err == nil {
@@ -32,7 +35,7 @@ func RoutesAdd(rGroup *gin.RouterGroup) {
 				handlers.SqlRoute(rGroup, endpoint)
 
 			default:
-				log.Printf("Skip, because kind has not been defined %s (%s)", endpoint.Path, endpoint.Kind)
+				log.Printf("WARN: Skip, because kind has not been defined %s (%s)", endpoint.Path, endpoint.Kind)
 
 			}
 
