@@ -25,7 +25,7 @@ func main() {
 	flag.StringVar(&config.NAME, "name", libs.GetEnv("NAME", "troll"), "Define custom application name")
 	flag.IntVar(&config.WAIT, "wait", 0, "Minimal wait time before each request")
 	flag.StringVar(&config.DOC_ROOT, "root", libs.GetEnv("DOC_ROOT", "./public"), "Define document root for serving files")
-	flag.StringVar(&config.V2_PATH, "v2-path", libs.GetEnv("V2_PATH", "./v2_api.yaml"), "Define path to v2 api endpoint configuration yaml")
+	flag.StringVar(&config.CONFIG_FILE, "config", libs.GetEnv("CONFIG_FILE", "./config.yaml"), "Configure api endpoint")
 	flag.StringVar(&config.DSN, "dsn", libs.GetEnv("DSN", ""), "Define database DSN")
 	flag.StringVar(&config.ADDRESS, "addr", libs.GetEnv("ADDRESS", ":8080"), "Define address and port where the application listen")
 	flag.StringVar(&config.LOG_LEVEL, "log", libs.GetEnv("LOG_LEVEL", "info"), "Define LOG_LEVEL")
@@ -49,5 +49,11 @@ func main() {
 	// It is enought
 	router := server.InitRoutes()
 
+	fmt.Printf("\n\nAvailable routes:\n")
+	for _, r := range router.Routes() {
+		fmt.Printf("  ▶︎ %-6s %-30s\n", r.Method, r.Path)
+	}
+	fmt.Printf("\n\n")
+	log.Printf("INFO: Listen on address %s", config.ADDRESS)
 	router.Run(config.ADDRESS)
 }

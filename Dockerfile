@@ -18,7 +18,6 @@ COPY --from=build /usr/local/bin/troll /usr/local/bin/troll
 COPY templates /opt/troll/templates
 COPY static /opt/troll/static
 COPY public /opt/troll/public
-COPY v2_api.yaml /opt/troll/v2_api.yaml
 
 WORKDIR /opt/troll
 

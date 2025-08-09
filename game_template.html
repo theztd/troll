@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Status Page</title>
+    <style>
+        .div-ok { background-color: #c8e6c9; padding: 10px; margin: 10px; }
+        .div-fail { background-color: #ffcdd2; padding: 10px; margin: 10px; }
+        .status { width: 50%; padding: 10px;}
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>Status Page</h1>
+    <div class="status">
+        {{range .}}
+        <div class="{{if eq .Code 200 }}div-ok{{else}}div-fail{{end}}">
+            <strong>{{.Url}}</strong><br/>
+            <pre>{{.Body}}</pre>
+        </div>
+        {{end}}
+    </div>
+</body>
+</html>

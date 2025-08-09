@@ -2,6 +2,12 @@
 name: Inventory
 description: Our company inventory includes employees and equipment
 version: 2022-09-09
+game:
+  route: /hello
+  templatePath: ./__game_template.html
+  backends:
+  - https://google.com
+  - https://root.cz
 endpoints:
 - path: /machines
   kind: basic
