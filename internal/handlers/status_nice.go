@@ -14,7 +14,8 @@ var BackendUrls = []string{
 	"http://service-c/v1/info",
 }
 
-const html_template = `
+// Default template
+var GameTemplate = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -44,7 +45,7 @@ func StatusNice(c *gin.Context) {
 		results = append(results, adapter.FetchUrl(url))
 	}
 
-	t, err := template.New("status").Parse(html_template)
+	t, err := template.New("status").Parse(GameTemplate)
 	if err != nil {
 		c.String(500, "Template error: %v", err)
 		return

@@ -1,10 +1,8 @@
 # Troll
 
-
-### Github badges
-[![GO Release](https://github.com/theztd/troll/actions/workflows/release_golang.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/release_golang.yml)
-[![Helm charts releaser](https://github.com/theztd/troll/actions/workflows/release_helm.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/release_helm.yml)
-[![Build and release docker image](https://github.com/theztd/troll/actions/workflows/release_docker.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/release_docker.yml)
+  [![Troll Release](https://github.com/theztd/troll/actions/workflows/release_golang.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/release_golang.yml)
+  [![Helm Release](https://github.com/theztd/troll/actions/workflows/release_helm.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/release_helm.yml)
+  [![Docker image Release](https://github.com/theztd/troll/actions/workflows/release_docker.yml/badge.svg)](https://github.com/theztd/troll/actions/workflows/release_docker.yml)
 
 
 Troll is a very simple webserver returning defined response with configurable delay and a few more features.
@@ -20,7 +18,7 @@ Troll is a very simple webserver returning defined response with configurable de
 
 **Quick Links**
 
- * [DEMO application (Try it!!!)](https://troll.fejk.net)
+ * [DEMO application (Try it!!!)](https://troll.check-this.link)
 
 
 
@@ -50,7 +48,7 @@ Troll is a very simple webserver returning defined response with configurable de
 env GOOS=target-OS GOARCH=target-architecture go build -o troll cmd/troll/main.go
 ```
 
-## 🚀 RUN
+## 🚀 RUN and Operate
 
 ```bash
 troll -help
@@ -71,14 +69,14 @@ troll -help
     	Minimal wait time before each request
 ```
 
-## Helm install
+### 📦 Helm install
 
 ```bash
 helm repo add troll https://theztd.github.io/troll/
 helm install troll-test  troll/troll
 ```
 
-## Config
+### 🛠️ Config
 
 Configuration is possible via ENV variables
 
@@ -183,7 +181,7 @@ promhttp_metric_handler_requests_total{code="500"} 0
 promhttp_metric_handler_requests_total{code="503"} 0
 ```
 
-#### 🔎 Logs
+### 🔎 Logs
 
 Change log level by env LOG_LEVEL
 
@@ -217,3 +215,11 @@ Here are the types you can use:
 | **doc**  | Documentation                      | doc(readme): add build instructions          |
 | **ci**   | CI/CD or pipeline changes          | ci(k8s): append canary release ingress       |
 | **test** | Testing or temporary experiments   | test(api): log request body for debugging    |
+
+### 🎭 Helm release
+
+ * Do changes in ./Helm directory
+ * Don't forget to increase version in Chart.yaml file
+ * Push your changes
+
+

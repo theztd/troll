@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -34,6 +35,12 @@ func FetchUrl(url string) FetchResult {
 	}
 
 	res.Code = resp.StatusCode
-	res.Body = string(body)
+	fmt.Println("Delka odpovedi je: ", len(body))
+	if len(body) > 350 {
+		res.Body = string(body[:320]) + "  ...(shorter version)"
+	} else {
+		res.Body = string(body)
+	}
+
 	return res
 }

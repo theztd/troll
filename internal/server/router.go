@@ -1,11 +1,12 @@
 package server
 
 import (
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	apiV1 "gitlab.com/theztd/troll/internal/api/v1"
-	apiV2 "gitlab.com/theztd/troll/internal/api/v2"
 	"gitlab.com/theztd/troll/internal/config"
 	"gitlab.com/theztd/troll/internal/handlers"
 	"gitlab.com/theztd/troll/internal/midleware"
@@ -20,6 +21,10 @@ func InitRoutes() *gin.Engine {
 	*/
 	// router.TrustedPlatform = "X-CDN-IP"
 	// router.SetTrustedProxies([]string{"127.0.0.1"})
+	if config.LOG_LEVEL == "debug" {
+		gin.SetMode(gin.DebugMode)
+	}
+	gin.SetMode("release")
 
 	router := gin.New()
 	router.Use(midleware.Chaos())
@@ -53,13 +58,48 @@ func InitRoutes() *gin.Engine {
 	// define default for not found
 	router.NoRoute(handlers.HandleNotFound)
 
-	v1 := router.Group("v1")
-	config.Metrics.Use(v1)
-	apiV1.RoutesAdd(v1)
+	// if CONFIG_FILE exists, load routes
+	if _, err := os.Stat(config.CONFIG_FILE); err == nil {
+		cfg := config.LoadYaml(config.CONFIG_FILE)
 
-	v2 := router.Group("v2")
-	config.Metrics.Use(v2)
-	apiV2.RoutesAdd(v2)
+		// Game route initialization
+		handlers.BackendUrls = cfg.Game.Backends
+		if tmplBytes, err := os.ReadFile(cfg.Game.TemplatePath); err == nil {
+			handlers.GameTemplate = string(tmplBytes)
+		}
+
+		if cfg.Game.Route != "" {
+			router.GET(cfg.Game.Route, handlers.StatusNice)
+			log.Println("INFO: Initialize GAME route 🎲 " + cfg.Game.Route)
+		} else {
+			router.GET("/the-game", handlers.StatusNice)
+			log.Println("INFO: Initialize GAME route 🎲 " + "/the-game")
+		}
+
+		v1 := router.Group("v1")
+		log.Println("INFO: Initialize V1 routes 🏗️ ...")
+		for _, endpoint := range cfg.Endpoints {
+			switch endpoint.Kind {
+			case "basic":
+				handlers.BasicRoute(v1, endpoint)
+
+			case "sql":
+				handlers.SqlRoute(v1, endpoint)
+
+			default:
+				log.Printf("WARN: Skip, because kind has not been defined %s (%s)", endpoint.Path, endpoint.Kind)
+
+			}
+
+		}
+	} else {
+		log.Println("WARN: Unable to find file " + config.CONFIG_FILE)
+		log.Println("INFO: Initialize default routes")
+
+		v1 := router.Group("v1")
+		config.Metrics.Use(v1)
+		apiV1.RoutesAdd(v1)
+	}
 
 	return router
 }
