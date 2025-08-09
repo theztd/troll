@@ -71,6 +71,13 @@ troll -help
     	Minimal wait time before each request
 ```
 
+## Helm install
+
+```bash
+helm repo add troll https://theztd.github.io/troll/
+helm install troll-test  troll/troll
+```
+
 ## Config
 
 Configuration is possible via ENV variables
@@ -187,7 +194,6 @@ Change log level by env LOG_LEVEL
 2023/04/18 16:41:12 [application:nodeName] DEBUG: Auth DB migration...
 2023/04/18 16:41:12 [application:nodeName] INFO: Waiting for request at address :8080
 ```
-
 
 ### Backup
 

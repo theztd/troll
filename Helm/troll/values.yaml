@@ -1,6 +1,6 @@
 replicaCount: 1
 image:
-  repository: ghcr.io/troll
+  repository: ghcr.io/theztd/troll
   pullPolicy: IfNotPresent
   tag: "main"
 
