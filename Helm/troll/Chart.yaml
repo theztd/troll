@@ -3,4 +3,4 @@ name: troll
 description: Troll is an example application usefull for infrastructure testing
 type: application
 version: 0.1.4
-appVersion: "1.6.0"
+appVersion: "1.6.1"
