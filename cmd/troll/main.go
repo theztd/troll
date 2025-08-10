@@ -17,8 +17,8 @@ import (
 
 func main() {
 	err := godotenv.Load()
-	if err != nil {
-		log.Println("INFO: Unable to find .env file.")
+	if err == nil {
+		log.Println("INFO: Loading configuration from .env file.")
 	}
 
 	// declare arguments
@@ -37,7 +37,7 @@ func main() {
 	flag.Parse()
 
 	if config.READY_DELAY > 0 {
-		fmt.Printf("Application init")
+		fmt.Printf("Starting application, give me %d sec.", config.READY_DELAY)
 		for i := 0; i < config.READY_DELAY; i++ {
 			time.Sleep(time.Duration(1 * time.Second))
 			fmt.Printf(".")
@@ -54,6 +54,6 @@ func main() {
 		fmt.Printf("  ▶︎ %-6s %-30s\n", r.Method, r.Path)
 	}
 	fmt.Printf("\n\n")
-	log.Printf("INFO: Listen on address %s", config.ADDRESS)
+	log.Printf("INFO: Running in mode: \"%s\" and listening on address %s. 😈 Enjoy!", config.LOG_LEVEL, config.ADDRESS)
 	router.Run(config.ADDRESS)
 }

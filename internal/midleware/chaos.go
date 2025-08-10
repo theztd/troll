@@ -18,7 +18,9 @@ func Chaos() gin.HandlerFunc {
 
 			Simulate broken application using RAM
 		*/
-		log.Println("INFO [Chaos]: Doing something wrong 😈...")
+		if config.LOG_LEVEL == "debug" {
+			log.Println("DEBUG [Chaos]: Doing something wrong 😈...")
+		}
 		if config.HEAVY_RAM > 0 || c.DefaultQuery("heavy", "") == "ram" {
 			if config.LOG_LEVEL == "debug" {
 				log.Println("DEBUG [Chaos]: Filling memmory, because you set it by argument ?heavy=ram or option -heavy-ram")

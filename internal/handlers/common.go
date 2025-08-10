@@ -35,7 +35,9 @@ func GetStatus(c *gin.Context) {
 }
 
 func Ready(c *gin.Context) {
-	log.Println("DEBUG [handler.Ready]: Processing.")
+	if config.LOG_LEVEL == "debug" {
+		log.Println("DEBUG [handler.Ready]: Processing.")
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "pass",
 		"version": config.VERSION,
@@ -48,7 +50,10 @@ func Ready(c *gin.Context) {
 
 func GetAllHeaders(c *gin.Context) {
 	reqDump, _ := httputil.DumpRequest(c.Request, true)
-	fmt.Println(string(reqDump))
+	if config.LOG_LEVEL == "debug" {
+		log.Println("DEBUG [GetAllHeaders]: Dump all headers.")
+		fmt.Println(string(reqDump))
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"rec_headers": strings.Split(string(reqDump), "\r\n"),
 	})
@@ -60,10 +65,15 @@ func GetSlowResponse(c *gin.Context) {
 	// make response randomly slower
 	delay := (time.Duration(config.WAIT+rand.Intn(500)) * time.Millisecond) + time.Duration(wait)*time.Millisecond
 	time.Sleep(delay)
-	fmt.Println(delay)
+	if config.LOG_LEVEL == "debug" {
+		log.Printf("DEBUG [GetSlowResponse]: Simulate slow response %d", delay)
+	}
 
 	data, _ := io.ReadAll(c.Request.Body)
-	fmt.Println(string(data))
+	if config.LOG_LEVEL == "debug" {
+		log.Println("DEBUG [GetSlowResponse]: Dump request body")
+		fmt.Println(string(data))
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"item":  c.Param("item"),
@@ -76,7 +86,10 @@ func GetSlowResponse(c *gin.Context) {
 
 func HandleNotFound(c *gin.Context) {
 	reqDump, _ := httputil.DumpRequest(c.Request, true)
-	fmt.Println(string(reqDump))
+	if config.LOG_LEVEL == "debug" {
+		log.Println("DEBUG [HandleNotFound]: Dump request for debug")
+		fmt.Println(string(reqDump))
+	}
 	c.HTML(http.StatusNotFound, "404.html", gin.H{
 		"message": "You are looking for something what we are looking for too... Contact us and lets try to find it together :-)",
 	})

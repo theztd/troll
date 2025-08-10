@@ -28,6 +28,7 @@ func InitRoutes() *gin.Engine {
 
 	router := gin.New()
 	router.Use(midleware.Chaos())
+	router.Use(midleware.AuditLog())
 	router.Use(midleware.ServerReceivedHeaders())
 
 	// register static dir
@@ -93,8 +94,8 @@ func InitRoutes() *gin.Engine {
 
 		}
 	} else {
-		log.Println("WARN: Unable to find file " + config.CONFIG_FILE)
-		log.Println("INFO: Initialize default routes")
+		log.Printf("WARN: Unable to find config file \"%s\", but continue..", config.CONFIG_FILE)
+		log.Println("INFO: Initialize default routes 🏗️  ...")
 
 		v1 := router.Group("v1")
 		config.Metrics.Use(v1)
