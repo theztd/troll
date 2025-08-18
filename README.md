@@ -53,20 +53,27 @@ env GOOS=target-OS GOARCH=target-architecture go build -o troll cmd/troll/main.g
 ```bash
 troll -help
 
+  -addr string
+    	Define address and port where the application listen (default ":8080")
+  -config string
+    	Configure api endpoint (default "./config.yaml")
   -fail int
     	Returns 503. Set 1 - 10, where 10 = 100% error rate.
+  -fill-cpu int
+    	Generate stress on CPU with each request. Set duration in miliseconds (it also works as a delay for request)
   -fill-ram int
     	Fill ram with each request. Set number in bytes.
+  -log string
+    	Define LOG_LEVEL (default "info")
   -name string
     	Define custom application name (default "troll")
   -ready-delay int
-    	Simulate long application init (seconds).
+    	Simulate long application init (seconds). (default 3)
   -root string
     	Define document root for serving files (default "./public")
-  -v2-path string
-    	Define path to v2 api endpoint configuration yaml (default "./v2_api.yaml")
   -wait int
     	Minimal wait time before each request
+
 ```
 
 ### 📦 Helm install
