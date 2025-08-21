@@ -20,6 +20,7 @@ func GetInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"version":    config.VERSION,
 		"app_name":   "troll",
+		"node":       config.HOSTNAME,
 		"client_ip":  c.ClientIP(),
 		"referer":    c.Request.Referer(),
 		"user-agent": c.Request.UserAgent(),
@@ -29,23 +30,16 @@ func GetInfo(c *gin.Context) {
 
 func GetStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"msg":   "pong",
-		"reqId": requestid.Get(c),
+		"msg":  "pong",
+		"node": config.HOSTNAME,
 	})
 }
 
 func Ready(c *gin.Context) {
-	if config.LOG_LEVEL == "debug" {
-		log.Println("DEBUG [handler.Ready]: Processing.")
-	}
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "pass",
 		"version": config.VERSION,
-		"notes":   "Troll is a very simple webserver returning defined response with configurable delay and a few more features.",
 	})
-	if config.LOG_LEVEL == "debug" {
-		log.Println("DEBUG [handler.Ready]: Processed.")
-	}
 }
 
 func GetAllHeaders(c *gin.Context) {

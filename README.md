@@ -52,27 +52,28 @@ env GOOS=target-OS GOARCH=target-architecture go build -o troll cmd/troll/main.g
 
 ```bash
 troll -help
-
   -addr string
-    	Define address and port where the application listen (default ":8080")
+        Define address and port where the application listen. (ADDRESS) (default ":8080")
   -config string
-    	Configure api endpoint (default "./config.yaml")
+        Configure api endpoint. (CONFIG_FILE) (default "./config.yaml")
+  -dsn string
+        Define database DSN (default "postgresql://chuvicka:XciF3j5tLlMPVxlqBWlzjg@my-lab-3925.8nj.gcp-europe-west1.cockroachlabs.cloud:26257/chuvicka?sslmode=verify-full")
   -fail int
-    	Returns 503. Set 1 - 10, where 10 = 100% error rate.
+        Returns 503. Set 1 - 10, where 10 = 100% error rate. (FAIL_FREQ)
   -fill-cpu int
-    	Generate stress on CPU with each request. Set duration in miliseconds (it also works as a delay for request)
+        Generate stress on CPU with each request. It also works as a delay for request. Set in milisecodns. (HEAVY_CPU)
   -fill-ram int
-    	Fill ram with each request. Set number in bytes.
+        Fill ram with each request. Set number in bytes. (HEAVY_RAM)
   -log string
-    	Define LOG_LEVEL (default "info")
+        Define LOG_LEVEL (default "info")
   -name string
-    	Define custom application name (default "troll")
+        Define custom application name. (NAME) (default "troll")
   -ready-delay int
-    	Simulate long application init (seconds). (default 3)
+        Simulate long application init [sec]. (READY_DELAY) (default 5)
   -root string
-    	Define document root for serving files (default "./public")
+        Define document root for serving files. (DOC_ROOT) (default "./public")
   -wait int
-    	Minimal wait time before each request
+        Minimal wait time before each request. (REQUEST_DELAY)
 
 ```
 

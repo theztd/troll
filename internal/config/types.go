@@ -8,7 +8,7 @@ import (
 
 var Metrics = ginmetrics.GetMonitor()
 
-var VERSION string = "1.6.1"
+var VERSION string = "1.6.2"
 var LOG_LEVEL string
 var NAME string
 var DOC_ROOT string
@@ -21,3 +21,4 @@ var HEAVY_RAM int = 0
 var READY_DELAY int = 0
 var GAME bool = false
 var DSN string
+var HOSTNAME string

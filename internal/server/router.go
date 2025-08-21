@@ -44,7 +44,9 @@ func InitRoutes() *gin.Engine {
 	})
 
 	// _healthz routes
-	router.GET("/_healthz/ready.json", handlers.Ready)
+	router.GET("/_healthz/ready", handlers.Ready)
+	router.GET("/_healthz/status", handlers.GetStatus)
+	router.GET("/_healthz/info", handlers.GetInfo)
 
 	// get global Monitor object
 	config.Metrics.SetMetricPath("/_healthz/metrics")

@@ -10,9 +10,6 @@ func RoutesAdd(rtG *gin.RouterGroup) {
 	r := rtG.Group("/")
 
 	r.Use(requestid.New())
-
-	r.GET("/status", handlers.GetStatus)
-	r.GET("/info", handlers.GetInfo)
 	r.GET("/headers", handlers.GetAllHeaders)
 	r.GET("/:item/*id", handlers.GetSlowResponse)
 	r.POST("/:item/*id", handlers.GetSlowResponse)

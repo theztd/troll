@@ -7,8 +7,10 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"gitlab.com/theztd/troll/internal/config"
 	"gitlab.com/theztd/troll/internal/libs"
@@ -22,19 +24,25 @@ func main() {
 	}
 
 	// declare arguments
-	flag.StringVar(&config.NAME, "name", libs.GetEnv("NAME", "troll"), "Define custom application name")
-	flag.IntVar(&config.WAIT, "wait", 0, "Minimal wait time before each request")
-	flag.StringVar(&config.DOC_ROOT, "root", libs.GetEnv("DOC_ROOT", "./public"), "Define document root for serving files")
-	flag.StringVar(&config.CONFIG_FILE, "config", libs.GetEnv("CONFIG_FILE", "./config.yaml"), "Configure api endpoint")
+	flag.StringVar(&config.NAME, "name", libs.GetEnv("NAME", "troll"), "Define custom application name. (NAME)")
+	flag.IntVar(&config.WAIT, "wait", libs.GetEnvInt("REQUEST_DELAY", 0), "Minimal wait time before each request. (REQUEST_DELAY)")
+	flag.StringVar(&config.DOC_ROOT, "root", libs.GetEnv("DOC_ROOT", "./public"), "Define document root for serving files. (DOC_ROOT)")
+	flag.StringVar(&config.CONFIG_FILE, "config", libs.GetEnv("CONFIG_FILE", "./config.yaml"), "Configure api endpoint. (CONFIG_FILE)")
 	flag.StringVar(&config.DSN, "dsn", libs.GetEnv("DSN", ""), "Define database DSN")
-	flag.StringVar(&config.ADDRESS, "addr", libs.GetEnv("ADDRESS", ":8080"), "Define address and port where the application listen")
+	flag.StringVar(&config.ADDRESS, "addr", libs.GetEnv("ADDRESS", ":8080"), "Define address and port where the application listen. (ADDRESS)")
 	flag.StringVar(&config.LOG_LEVEL, "log", libs.GetEnv("LOG_LEVEL", "info"), "Define LOG_LEVEL")
-	flag.IntVar(&config.FAIL_FREQ, "fail", 0, "Returns 503. Set 1 - 10, where 10 = 100% error rate.")
-	flag.IntVar(&config.HEAVY_RAM, "fill-ram", 0, "Fill ram with each request. Set number in bytes.")
-	flag.IntVar(&config.HEAVY_CPU, "fill-cpu", 0, "Generate stress on CPU with each request. Set duration in miliseconds (it also works as a delay for request)")
-	flag.IntVar(&config.READY_DELAY, "ready-delay", 3, "Simulate long application init (seconds).")
+	flag.IntVar(&config.FAIL_FREQ, "fail", libs.GetEnvInt("FAIL_FREQ", 0), "Returns 503. Set 1 - 10, where 10 = 100% error rate. (FAIL_FREQ)")
+	flag.IntVar(&config.HEAVY_RAM, "fill-ram", libs.GetEnvInt("HEAVY_RAM", 0), "Fill ram with each request. Set number in bytes. (HEAVY_RAM)")
+	flag.IntVar(&config.HEAVY_CPU, "fill-cpu", libs.GetEnvInt("HEAVY_CPU", 0), "Generate stress on CPU with each request. It also works as a delay for request. Set in milisecodns. (HEAVY_CPU)")
+	flag.IntVar(&config.READY_DELAY, "ready-delay", libs.GetEnvInt("READY_DELAY", 5), "Simulate long application init [sec]. (READY_DELAY)")
 
 	flag.Parse()
+
+	config.HOSTNAME, err = os.Hostname()
+	if err != nil {
+		log.Println("WARN: Unable to get Hostname", err)
+		config.HOSTNAME = fmt.Sprintf("%s-%s", config.NAME, uuid.NewString()[:6])
+	}
 
 	if config.READY_DELAY > 0 {
 		fmt.Printf("Starting application, give me %d sec.", config.READY_DELAY)
