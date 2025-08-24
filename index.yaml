@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   troll:
   - apiVersion: v2
+    appVersion: 1.6.3
+    created: "2025-08-24T19:24:33.874642858Z"
+    description: Troll is an example application usefull for infrastructure testing
+    digest: 99aeb13c1d5648de595024be24dc089a3a6172095eae48ab8b7f056f8a398f24
+    name: troll
+    type: application
+    urls:
+    - https://github.com/theztd/troll/releases/download/troll-0.1.7/troll-0.1.7.tgz
+    version: 0.1.7
+  - apiVersion: v2
     appVersion: 1.6.2
     created: "2025-08-21T20:28:03.415031606Z"
     description: Troll is an example application usefull for infrastructure testing
@@ -51,4 +61,4 @@ entries:
     urls:
     - https://github.com/theztd/troll/releases/download/troll-0.1.1/troll-0.1.1.tgz
     version: 0.1.1
-generated: "2025-08-21T20:28:03.415073325Z"
+generated: "2025-08-24T19:24:33.874694435Z"
