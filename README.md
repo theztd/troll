@@ -61,19 +61,19 @@ troll -help
   -fail int
         Returns 503. Set 1 - 10, where 10 = 100% error rate. (FAIL_FREQ)
   -fill-cpu int
-        Generate stress on CPU with each request. It also works as a delay for request. Set in milisecodns. (HEAVY_CPU)
+        Generate stress on CPU with each request. It also works as a delay for request [milisecodns]. (HEAVY_CPU)
   -fill-ram int
-        Fill ram with each request. Set number in bytes. (HEAVY_RAM)
+        Fill ram with each request [bytes]. (HEAVY_RAM)
   -log string
         Define LOG_LEVEL (default "info")
   -name string
         Define custom application name. (NAME) (default "troll")
   -ready-delay int
         Simulate long application init [sec]. (READY_DELAY) (default 5)
+  -req-delay int
+        Minimal delay before response on request [miliseconds]. (REQUEST_DELAY)
   -root string
         Define document root for serving files. (DOC_ROOT) (default "./public")
-  -wait int
-        Minimal wait time before each request. (REQUEST_DELAY)
 
 ```
 

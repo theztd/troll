@@ -8,11 +8,11 @@ import (
 
 var Metrics = ginmetrics.GetMonitor()
 
-var VERSION string = "1.6.2"
+var VERSION string = "1.6.3"
 var LOG_LEVEL string
 var NAME string
 var DOC_ROOT string
-var WAIT int = 0
+var REQUEST_DELAY int = 0
 var ADDRESS string
 var CONFIG_FILE string
 var FAIL_FREQ int = 0
@@ -22,3 +22,4 @@ var READY_DELAY int = 0
 var GAME bool = false
 var DSN string
 var HOSTNAME string
+var BADASS bool

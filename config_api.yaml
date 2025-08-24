@@ -8,6 +8,15 @@ game:
   backends:
   - https://google.com
   - https://root.cz
+  - http://service-a
+  - http://service-b
+  - http://service-c
+  - http://service-d
+  - http://service-e
+  - http://service-f
+  - http://service-g
+  - http://service-x
+  - http://service-k
 endpoints:
 - path: /machines
   kind: basic

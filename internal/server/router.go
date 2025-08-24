@@ -44,9 +44,9 @@ func InitRoutes() *gin.Engine {
 	})
 
 	// _healthz routes
-	router.GET("/_healthz/ready", handlers.Ready)
-	router.GET("/_healthz/status", handlers.GetStatus)
-	router.GET("/_healthz/info", handlers.GetInfo)
+	router.GET("/_healthz/info", midleware.RandomDelay, handlers.DumpRequest)
+	router.GET("/_healthz/alive", midleware.RandomDelay, handlers.DumpRequest)
+	router.GET("/_healthz/ready", midleware.RandomDelay, handlers.Ready)
 
 	// get global Monitor object
 	config.Metrics.SetMetricPath("/_healthz/metrics")
@@ -72,10 +72,10 @@ func InitRoutes() *gin.Engine {
 		}
 
 		if cfg.Game.Route != "" {
-			router.GET(cfg.Game.Route, handlers.StatusNice)
+			router.GET(cfg.Game.Route, handlers.GameUI)
 			log.Println("INFO: Initialize GAME route 🎲 " + cfg.Game.Route)
 		} else {
-			router.GET("/the-game", handlers.StatusNice)
+			router.GET("/the-game", handlers.GameUI)
 			log.Println("INFO: Initialize GAME route 🎲 " + "/the-game")
 		}
 
@@ -102,6 +102,9 @@ func InitRoutes() *gin.Engine {
 		v1 := router.Group("v1")
 		config.Metrics.Use(v1)
 		apiV1.RoutesAdd(v1)
+	}
+	if config.LOG_LEVEL == "DEBUG" {
+		log.Println("DEBUG [router.InitRoutes]: All routes has been initialized")
 	}
 
 	return router

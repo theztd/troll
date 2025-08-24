@@ -3,6 +3,7 @@ package midleware
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"math/rand/v2"
@@ -10,6 +11,23 @@ import (
 	"github.com/gin-gonic/gin"
 	"gitlab.com/theztd/troll/internal/config"
 )
+
+func RandomDelay(c *gin.Context) {
+	/*
+		Slow down responses by REQUEST_DELAY + ?wait=XX - both is in miliseconds
+	*/
+	wait, _ := strconv.Atoi(c.Query("wait"))
+
+	// make response randomly slower
+	delay := (time.Duration(config.REQUEST_DELAY+rand.IntN(500)) * time.Millisecond) +
+		(time.Duration(wait) * time.Millisecond)
+	if config.LOG_LEVEL == "debug" {
+		log.Printf("DEBUG [RandomDelay]: Simulate slow response %d milisec", delay)
+	}
+	time.Sleep(delay)
+	c.Next()
+
+}
 
 func Chaos() gin.HandlerFunc {
 	return func(c *gin.Context) {

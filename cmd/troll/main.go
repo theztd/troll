@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/google/uuid"
@@ -25,18 +27,40 @@ func main() {
 
 	// declare arguments
 	flag.StringVar(&config.NAME, "name", libs.GetEnv("NAME", "troll"), "Define custom application name. (NAME)")
-	flag.IntVar(&config.WAIT, "wait", libs.GetEnvInt("REQUEST_DELAY", 0), "Minimal wait time before each request. (REQUEST_DELAY)")
+	flag.IntVar(&config.REQUEST_DELAY, "req-delay", libs.GetEnvInt("REQUEST_DELAY", 0), "Minimal delay before response on request [miliseconds]. (REQUEST_DELAY)")
 	flag.StringVar(&config.DOC_ROOT, "root", libs.GetEnv("DOC_ROOT", "./public"), "Define document root for serving files. (DOC_ROOT)")
 	flag.StringVar(&config.CONFIG_FILE, "config", libs.GetEnv("CONFIG_FILE", "./config.yaml"), "Configure api endpoint. (CONFIG_FILE)")
 	flag.StringVar(&config.DSN, "dsn", libs.GetEnv("DSN", ""), "Define database DSN")
 	flag.StringVar(&config.ADDRESS, "addr", libs.GetEnv("ADDRESS", ":8080"), "Define address and port where the application listen. (ADDRESS)")
 	flag.StringVar(&config.LOG_LEVEL, "log", libs.GetEnv("LOG_LEVEL", "info"), "Define LOG_LEVEL")
 	flag.IntVar(&config.FAIL_FREQ, "fail", libs.GetEnvInt("FAIL_FREQ", 0), "Returns 503. Set 1 - 10, where 10 = 100% error rate. (FAIL_FREQ)")
-	flag.IntVar(&config.HEAVY_RAM, "fill-ram", libs.GetEnvInt("HEAVY_RAM", 0), "Fill ram with each request. Set number in bytes. (HEAVY_RAM)")
-	flag.IntVar(&config.HEAVY_CPU, "fill-cpu", libs.GetEnvInt("HEAVY_CPU", 0), "Generate stress on CPU with each request. It also works as a delay for request. Set in milisecodns. (HEAVY_CPU)")
+	flag.IntVar(&config.HEAVY_RAM, "fill-ram", libs.GetEnvInt("HEAVY_RAM", 0), "Fill ram with each request [bytes]. (HEAVY_RAM)")
+	flag.IntVar(&config.HEAVY_CPU, "fill-cpu", libs.GetEnvInt("HEAVY_CPU", 0), "Generate stress on CPU with each request. It also works as a delay for request [milisecodns]. (HEAVY_CPU)")
 	flag.IntVar(&config.READY_DELAY, "ready-delay", libs.GetEnvInt("READY_DELAY", 5), "Simulate long application init [sec]. (READY_DELAY)")
 
 	flag.Parse()
+
+	// Print received os signals
+	chanSig := make(chan os.Signal, 1)
+	signal.Notify(chanSig,
+		syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT,
+		syscall.SIGHUP, syscall.SIGUSR1, syscall.SIGUSR2,
+	)
+	go func() {
+		for s := range chanSig {
+			// Badass mode is disabled
+			if !config.BADASS {
+				switch s {
+				case syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT:
+					log.Printf("INFO: Received signal \"%s\".", s)
+					signal.Reset(s)
+					_ = syscall.Kill(os.Getpid(), s.(syscall.Signal))
+				}
+			} else {
+				log.Printf("INFO: Received signal \"%s\", but I do not do anything ⛄️.", s)
+			}
+		}
+	}()
 
 	config.HOSTNAME, err = os.Hostname()
 	if err != nil {
@@ -63,5 +87,7 @@ func main() {
 	}
 	fmt.Printf("\n\n")
 	log.Printf("INFO: Running in mode: \"%s\" and listening on address %s. 😈 Enjoy!", config.LOG_LEVEL, config.ADDRESS)
-	router.Run(config.ADDRESS)
+	if err := router.Run(config.ADDRESS); err != nil {
+		log.Fatal("FATAL: router.Run error...", err)
+	}
 }
