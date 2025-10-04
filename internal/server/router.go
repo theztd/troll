@@ -61,8 +61,8 @@ func InitRoutes() *gin.Engine {
 	// define default for not found
 	router.NoRoute(handlers.HandleNotFound)
 
-	// if CONFIG_FILE exists, load routes
-	if _, err := os.Stat(config.CONFIG_FILE); err == nil {
+	if _, err := os.Stat(config.CONFIG_FILE); err == nil && config.CONFIG_FILE != "" {
+		// if CONFIG_FILE exists and not empty, load routes
 		cfg := config.LoadYaml(config.CONFIG_FILE)
 
 		// Game route initialization
@@ -95,14 +95,21 @@ func InitRoutes() *gin.Engine {
 			}
 
 		}
+
+	} else if config.CONFIG_FILE != "" && os.IsNotExist(err) {
+		// if CONFIG_FILE is not empty and does not exists, than FAIL
+		log.Printf("FATAL: Given config file \"%s\" does not exists!!!", config.CONFIG_FILE)
+		os.Exit(66) // File not found
+
 	} else {
-		log.Printf("WARN: Unable to find config file \"%s\", but continue..", config.CONFIG_FILE)
+		log.Println("WARN: Config file is not defined, but continue with defaults..")
 		log.Println("INFO: Initialize default routes 🏗️  ...")
 
 		v1 := router.Group("v1")
 		config.Metrics.Use(v1)
 		apiV1.RoutesAdd(v1)
 	}
+
 	if config.LOG_LEVEL == "DEBUG" {
 		log.Println("DEBUG [router.InitRoutes]: All routes has been initialized")
 	}
