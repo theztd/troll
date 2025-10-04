@@ -29,7 +29,7 @@ func main() {
 	flag.StringVar(&config.NAME, "name", libs.GetEnv("NAME", "troll"), "Define custom application name. (NAME)")
 	flag.IntVar(&config.REQUEST_DELAY, "req-delay", libs.GetEnvInt("REQUEST_DELAY", 0), "Minimal delay before response on request [miliseconds]. (REQUEST_DELAY)")
 	flag.StringVar(&config.DOC_ROOT, "root", libs.GetEnv("DOC_ROOT", "./public"), "Define document root for serving files. (DOC_ROOT)")
-	flag.StringVar(&config.CONFIG_FILE, "config", libs.GetEnv("CONFIG_FILE", "./config.yaml"), "Configure api endpoint. (CONFIG_FILE)")
+	flag.StringVar(&config.CONFIG_FILE, "config", libs.GetEnv("CONFIG_FILE", ""), "Configure api endpoint. (CONFIG_FILE)")
 	flag.StringVar(&config.DSN, "dsn", libs.GetEnv("DSN", ""), "Define database DSN")
 	flag.StringVar(&config.ADDRESS, "addr", libs.GetEnv("ADDRESS", ":8080"), "Define address and port where the application listen. (ADDRESS)")
 	flag.StringVar(&config.LOG_LEVEL, "log", libs.GetEnv("LOG_LEVEL", "info"), "Define LOG_LEVEL")
@@ -75,7 +75,6 @@ func main() {
 			fmt.Printf(".")
 		}
 		fmt.Printf(" DONE\n\n")
-
 	}
 
 	// It is enought

@@ -116,7 +116,7 @@ endpoints:
 
  | Name | Url | Notes |
  |---|---|---|
- | FS:  | ./v2_api.yaml | v2 config file have to be available. |
+ | FS:  | ./config.yaml | Not required. |
  
 
 ### 📈 Monitoring
@@ -195,10 +195,10 @@ Change log level by env LOG_LEVEL
 
 **Format**
 ```log
-2023/04/18 16:41:11 [application:nodeName] INFO: Running env devel
-2023/04/18 16:41:12 [application:nodeName] DEBUG: Metrics DB migration...
-2023/04/18 16:41:12 [application:nodeName] DEBUG: Auth DB migration...
-2023/04/18 16:41:12 [application:nodeName] INFO: Waiting for request at address :8080
+2023/04/18 16:41:11 INFO: Running env devel
+2023/04/18 16:41:12 DEBUG: Metrics DB migration...
+2023/04/18 16:41:12 DEBUG: Auth DB migration...
+2023/04/18 16:41:12 INFO: Waiting for request at address :8080
 ```
 
 ### Backup
