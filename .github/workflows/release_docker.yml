@@ -25,10 +25,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Log in to the Container registry
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -57,14 +57,63 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-            platforms: linux/amd64, linux/arm64
-            push: true
-            tags: ${{ steps.meta.outputs.tags }}
-            labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64, linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
       - name: COPY CONTAINER IMAGE NAME
         run: |
           echo "## :whale: There are available new images:" >> $GITHUB_STEP_SUMMARY
+
+
+      - name: Render build summary (markdown)
+        id: sum_md
+        shell: bash
+        run: |
+          DIGEST="${{ steps.build.outputs.digest }}"  # manifest list digest
+          {
+            echo 'markdown<<EOF'
+            echo '## Built container images'
+            echo
+            echo '| Image:Tag | Digest |'
+            echo '|---|---|'
+            # tags jsou newline-delimited
+            while IFS= read -r TAG; do
+              [[ -z "$TAG" ]] && continue
+              echo "| \`$TAG\` | \`$DIGEST\` |"
+            done <<< "${{ steps.meta.outputs.tags }}"
+            echo
+            echo '> Note: all tags point to the same manifest digest above.'
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Append to Job Summary
+        run: |
+          echo "${{ steps.sum_md.outputs.markdown }}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Add run annotation
+        run: |
+          MSG="$(echo "${{ steps.meta.outputs.tags }}" | tr '\n' ' ')"
+          echo "::notice title=Built images::${MSG} (digest ${{ steps.build.outputs.digest }})"
+
+      # 6) PR komentář
+      - name: Comment on PR with images
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = process.env.MARKDOWN;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            })
+        env:
+          MARKDOWN: ${{ steps.sum_md.outputs.markdown }}
+
+
 
 
 
