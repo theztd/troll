@@ -1,0 +1,32 @@
+2025/12/30 16:18:12 INFO: Loading configuration from .env file.
+Usage of /var/folders/3q/ry3x9fjn22d488x5s0gr57fc0000gn/T/go-build3509169478/b001/exe/main:
+  -config string
+    	Configure api endpoint. (CONFIG_FILE)
+  -http.addr string
+    	Define address and port where the application listen. (HTTP_ADDR) (default ":8080")
+  -http.error_rate int
+    	Returns 503. Set 1 - 10, where 10 = 100% error rate. (HTTP_ERROR_RATE)
+  -http.fill_cpu int
+    	Generate stress on CPU with each request. It also works as a delay for request [milisecodns]. (HEAVY_CPU)
+  -http.fill_ram int
+    	Fill ram with each request [bytes]. (HEAVY_RAM)
+  -http.req_delay int
+    	Minimal delay before response on request [miliseconds]. (REQUEST_DELAY)
+  -http.root string
+    	Define document root for serving files. (DOC_ROOT) (default "./public")
+  -log_level string
+    	Define LOG_LEVEL (default "info")
+  -name string
+    	Define custom application name. (NAME) (default "troll")
+  -ready_delay int
+    	Simulate long application init [sec]. (READY_DELAY) (default 5)
+  -tcp.addr string
+    	Define address and port where the tcp proxy listens. (TCP_ADDR) (default ":9999")
+  -tcp.dest_addr string
+    	Define address and port where to send tcp proxy requests. (TCP_DEST_ADDR) (default "127.0.0.1:8080")
+  -tcp.error_rate int
+    	Simulate random error rate.  Set 1 - 10, where 10 = 100% error rate. (TCP_ERROR_RATE)
+  -tcp.max_delay int
+    	Simulate long response max delay [miliseconds]. (TCP_MAX_DELAY) (default 5000)
+  -tcp.min_delay int
+    	Simulate long response minimal delay [miliseconds]. (TCP_MIN_DELAY) (default 100)

@@ -77,7 +77,7 @@ func Chaos() gin.HandlerFunc {
 
 			Higher FAIL_FREQ value means more errors
 		*/
-		if rand.IntN(10) < config.FAIL_FREQ {
+		if rand.IntN(10) < config.ERROR_RATE {
 
 			c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{
 				"message": "Troll generates random error, because option -fail has been set. Disable it if you don't wnat to see this error again.",
