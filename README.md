@@ -10,11 +10,13 @@ Troll is a very simple webserver returning defined response with configurable de
 **INFO**
 
  * Report Issues: **https://github.com/theztd/troll/issues/new**
- * Listen port: **8080** (changable via **PORT** env)
- * Health Url: **/_healthz/ready.json**
- * Readines URL: **/_healthz/ready.json**
- * Livenes URL: **/_healthz/ready.json**
- * Metrics URL **/_healthz/metrics/**
+ * Http listen port: **8080** (changable via **http.ADDR** env)
+ * TCP proxy listen port: **9999** (changable via **tcp.ADDR** env)
+ * Info endpoint URL: **GET /_healthz/info**
+ * Readines URL: **GET /_healthz/ready**
+ * Livenes URL: **GET /_healthz/alive**
+ * Metrics URL: **GET /_healthz/metrics**
+ * Headers debug URL: **GET /v1/headers**
 
 **Quick Links**
 
@@ -41,6 +43,8 @@ Troll is a very simple webserver returning defined response with configurable de
  * Fill RAM with each request (simulate mem leaks)
  * Generate CPU load on requests with ?heavy=cpu param
  * Ready delay for testing canary releases and readyness check
+ * Tcp Proxy with random delay and random error generator
+ * Routes could be defined via YAML config and can do SQL query, redis query and shell commands
 
 ## 🧱 Build
 
@@ -50,30 +54,42 @@ env GOOS=target-OS GOARCH=target-architecture go build -o troll cmd/troll/main.g
 
 ## 🚀 RUN and Operate
 
+
+### 🛠️ Config
 ```bash
 troll -help
-  -addr string
-        Define address and port where the application listen. (ADDRESS) (default ":8080")
-  -config string
-        Configure api endpoint. (CONFIG_FILE) (default "./config.yaml")
-  -dsn string
-        Define database DSN (default "postgresql://chuvicka:XciF3j5tLlMPVxlqBWlzjg@my-lab-3925.8nj.gcp-europe-west1.cockroachlabs.cloud:26257/chuvicka?sslmode=verify-full")
-  -fail int
-        Returns 503. Set 1 - 10, where 10 = 100% error rate. (FAIL_FREQ)
-  -fill-cpu int
-        Generate stress on CPU with each request. It also works as a delay for request [milisecodns]. (HEAVY_CPU)
-  -fill-ram int
-        Fill ram with each request [bytes]. (HEAVY_RAM)
-  -log string
-        Define LOG_LEVEL (default "info")
   -name string
         Define custom application name. (NAME) (default "troll")
-  -ready-delay int
+  -log_level string
+        Define LOG_LEVEL (default "info")
+  -ready_delay int
         Simulate long application init [sec]. (READY_DELAY) (default 5)
-  -req-delay int
+  -config string
+        Configure api endpoint. (CONFIG_FILE)
+
+  -http.addr string
+        Define address and port where the application listen. (HTTP_ADDR) (default ":8080")
+  -http.error_rate int
+        Returns 503. Set 1 - 10, where 10 = 100% error rate. (HTTP_ERROR_RATE)
+  -http.fill_cpu int
+        Generate stress on CPU with each request. It also works as a delay for request [milisecodns]. (HEAVY_CPU)
+  -http.fill_ram int
+        Fill ram with each request [bytes]. (HEAVY_RAM)
+  -http.req_delay int
         Minimal delay before response on request [miliseconds]. (REQUEST_DELAY)
-  -root string
+  -http.root string
         Define document root for serving files. (DOC_ROOT) (default "./public")
+
+  -tcp.addr string
+        Define address and port where the tcp proxy listens. (TCP_ADDR) (default ":9999")
+  -tcp.dest_addr string
+        Define address and port where to send tcp proxy requests. (TCP_DEST_ADDR) (default "127.0.0.1:8080")
+  -tcp.error_rate int
+        Simulate random error rate.  Set 1 - 10, where 10 = 100% error rate. (TCP_ERROR_RATE)
+  -tcp.max_delay int
+        Simulate long response max delay [miliseconds]. (TCP_MAX_DELAY) (default 5000)
+  -tcp.min_delay int
+        Simulate long response minimal delay [miliseconds]. (TCP_MIN_DELAY) (default 100)
 
 ```
 
@@ -84,32 +100,36 @@ helm repo add troll https://theztd.github.io/troll/
 helm install troll-test  troll/troll
 ```
 
-### 🛠️ Config
-
-Configuration is possible via ENV variables
-
- |Key| Default | description |
- |---|:---:|---|
- | ADDRESS | :8080 | Set **127.0.0.1:8080** to listen only on localhost |
- | LOG_LEVEL | info | Valid options are: error, warning, info, debug |
-
-More options are posible via arguments. Configuration of v2 api is possible as follows... 
 
 ### 🤖 Custom API definition
 
-By editing v2_api.yaml you can change /v2 endpoints and his responses (return code including).
+By editing config_api.yaml you can change /v2 endpoints and his responses (return code including).
 
 The default structure is:
 ```yaml
 ---
 name: Inventory
 description: Our company inventory includes employees and equipment
-version: 2022-02-09
+version: 2022-09-09
+game:
+  # Enable and configure GAME UI
+  route: /game
+  templatePath: ./__game_template.html
+  backends:
+  - http://service-a
+  - http://service-b
+  - http://service-c
 endpoints:
-- path: /employee
+- path: /machines
+  kind: basic
   method: GET
   code: 200
-  response: "List of our employee..."
+  response: "We have plenty of machines in our factory as you can see as follows..."
+- path: /machines/add
+  kind: basic
+  method: POST
+  code: 200
+  response: "New machine has been added"
 ```
 
 ### 🌿 Dependencies
@@ -195,10 +215,35 @@ Change log level by env LOG_LEVEL
 
 **Format**
 ```log
-2023/04/18 16:41:11 INFO: Running env devel
-2023/04/18 16:41:12 DEBUG: Metrics DB migration...
-2023/04/18 16:41:12 DEBUG: Auth DB migration...
-2023/04/18 16:41:12 INFO: Waiting for request at address :8080
+2025/12/30 16:23:03 INFO: Loading configuration from .env file.
+Starting application, give me 1 sec.. DONE
+
+2025/12/30 16:23:04 INFO TcpProxy: Listening on :9999 and serving content from 127.0.0.1:8080
+2025/12/30 16:23:04 WARN: Config file is not defined, but continue with defaults..
+2025/12/30 16:23:04 INFO: Initialize default routes 🏗️  ...
+
+Available routes:
+  ▶︎ GET    /
+  ▶︎ GET    /_healthz/info
+  ▶︎ GET    /_healthz/alive
+  ▶︎ GET    /_healthz/ready
+  ▶︎ GET    /_healthz/metrics
+  ▶︎ GET    /v1/_healthz/metrics
+  ▶︎ GET    /v1/headers
+  ▶︎ GET    /v1/:item/*id
+  ▶︎ GET    /ws
+  ▶︎ GET    /websocket
+  ▶︎ GET    /public/*filepath
+  ▶︎ GET    /static/*filepath
+  ▶︎ HEAD   /public/*filepath
+  ▶︎ HEAD   /static/*filepath
+  ▶︎ POST   /v1/:item/*id
+
+
+2025/12/30 16:23:04 INFO: Running in mode: "info" and listening on address :8080. 😈 Enjoy!
+2025/12/30 16:23:14 INFO [AuditLog]: GET   /_metrics      404   From: 127.0.0.1 UA: vm_promscrape
+2025/12/30 16:23:24 INFO [AuditLog]: GET   /_metrics      404   From: 127.0.0.1 UA: vm_promscrape
+
 ```
 
 ### Backup
@@ -229,5 +274,3 @@ Here are the types you can use:
  * Do changes in ./Helm directory
  * Don't forget to increase version in Chart.yaml file
  * Push your changes
-
-
