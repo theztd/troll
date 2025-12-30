@@ -6,17 +6,10 @@ game:
   route: /hello
   templatePath: ./__game_template.html
   backends:
-  - https://google.com
-  - https://root.cz
   - http://service-a
   - http://service-b
   - http://service-c
   - http://service-d
-  - http://service-e
-  - http://service-f
-  - http://service-g
-  - http://service-x
-  - http://service-k
 endpoints:
 - path: /machines
   kind: basic
@@ -38,34 +31,15 @@ endpoints:
   method: GET
   code: 200
   response: "Our customers are listed there:"
-- path: /employee
-  kind: sql
+- path: /publications
+  dsn: "postgres://develdb:__PASSWORD__@pgsql-1:5432/develdb"
+  kind: psql
   method: GET
-  query: |
-    select
-      firstname, lastname, department, position 
-    from employee 
-    where 
-      firstname like '%' or lastname like '%' or department like '%';
-  args:
-  - firstname
-  - lastname
-  - department
+  query: "select id, database as db, results as r from publications;"
   response: |
     {
-      'data': [
-    {% range . %}
-        {
-          'uid' : '{{ .uid }}',
-          'firstname': '{{ .firstname }}',
-          'lastname': '{{ .lastname }}',
-          'department': '{{ .department }}',
-          'position': '{{ .position }}'
-        }
-    {% end %}
-      ],
-      'result_code': '{{ .response_code }}'
+      "message": "nazdarek",
+      "results": {{ json . }}
     }
     
-
-
+    

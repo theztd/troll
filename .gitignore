@@ -3,3 +3,4 @@ build/*
 coverage.txt
 .vscode/*
 .env
+config_test.yaml

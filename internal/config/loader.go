@@ -30,6 +30,7 @@ type Endpoint struct {
 	Args     []string
 	Code     int
 	Response string
+	DSN      string `yaml:"dsn"`
 }
 
 func LoadYaml(path string) (yamlData YamlRoot) {

@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -26,17 +27,27 @@ func main() {
 	}
 
 	// declare arguments
+	// Common args
 	flag.StringVar(&config.NAME, "name", libs.GetEnv("NAME", "troll"), "Define custom application name. (NAME)")
-	flag.IntVar(&config.REQUEST_DELAY, "req-delay", libs.GetEnvInt("REQUEST_DELAY", 0), "Minimal delay before response on request [miliseconds]. (REQUEST_DELAY)")
-	flag.StringVar(&config.DOC_ROOT, "root", libs.GetEnv("DOC_ROOT", "./public"), "Define document root for serving files. (DOC_ROOT)")
+	flag.IntVar(&config.READY_DELAY, "ready_delay", libs.GetEnvInt("READY_DELAY", 5), "Simulate long application init [sec]. (READY_DELAY)")
 	flag.StringVar(&config.CONFIG_FILE, "config", libs.GetEnv("CONFIG_FILE", ""), "Configure api endpoint. (CONFIG_FILE)")
-	flag.StringVar(&config.DSN, "dsn", libs.GetEnv("DSN", ""), "Define database DSN")
-	flag.StringVar(&config.ADDRESS, "addr", libs.GetEnv("ADDRESS", ":8080"), "Define address and port where the application listen. (ADDRESS)")
-	flag.StringVar(&config.LOG_LEVEL, "log", libs.GetEnv("LOG_LEVEL", "info"), "Define LOG_LEVEL")
-	flag.IntVar(&config.FAIL_FREQ, "fail", libs.GetEnvInt("FAIL_FREQ", 0), "Returns 503. Set 1 - 10, where 10 = 100% error rate. (FAIL_FREQ)")
-	flag.IntVar(&config.HEAVY_RAM, "fill-ram", libs.GetEnvInt("HEAVY_RAM", 0), "Fill ram with each request [bytes]. (HEAVY_RAM)")
-	flag.IntVar(&config.HEAVY_CPU, "fill-cpu", libs.GetEnvInt("HEAVY_CPU", 0), "Generate stress on CPU with each request. It also works as a delay for request [milisecodns]. (HEAVY_CPU)")
-	flag.IntVar(&config.READY_DELAY, "ready-delay", libs.GetEnvInt("READY_DELAY", 5), "Simulate long application init [sec]. (READY_DELAY)")
+	flag.StringVar(&config.LOG_LEVEL, "log_level", libs.GetEnv("LOG_LEVEL", "info"), "Define LOG_LEVEL")
+
+	// HTTP args
+	flag.IntVar(&config.REQUEST_DELAY, "http.req_delay", libs.GetEnvInt("REQUEST_DELAY", 0), "Minimal delay before response on request [miliseconds]. (REQUEST_DELAY)")
+	flag.StringVar(&config.DOC_ROOT, "http.root", libs.GetEnv("DOC_ROOT", "./public"), "Define document root for serving files. (DOC_ROOT)")
+	//flag.StringVar(&config.DSN, "dsn", libs.GetEnv("DSN", ""), "Define database DSN")
+	flag.StringVar(&config.ADDRESS, "http.addr", libs.GetEnv("HTTP_ADDR", ":8080"), "Define address and port where the application listen. (HTTP_ADDR)")
+	flag.IntVar(&config.ERROR_RATE, "http.error_rate", libs.GetEnvInt("HTTP_ERROR_RATE", 0), "Returns 503. Set 1 - 10, where 10 = 100% error rate. (HTTP_ERROR_RATE)")
+	flag.IntVar(&config.HEAVY_RAM, "http.fill_ram", libs.GetEnvInt("HEAVY_RAM", 0), "Fill ram with each request [bytes]. (HEAVY_RAM)")
+	flag.IntVar(&config.HEAVY_CPU, "http.fill_cpu", libs.GetEnvInt("HEAVY_CPU", 0), "Generate stress on CPU with each request. It also works as a delay for request [milisecodns]. (HEAVY_CPU)")
+
+	// TCP args
+	flag.StringVar(&config.TCP_ADDRESS, "tcp.addr", libs.GetEnv("TCP_ADDR", ":9999"), "Define address and port where the tcp proxy listens. (TCP_ADDR)")
+	flag.StringVar(&config.TCP_DEST_ADDRESS, "tcp.dest_addr", libs.GetEnv("TCP_DEST_ADDR", "127.0.0.1:8080"), "Define address and port where to send tcp proxy requests. (TCP_DEST_ADDR)")
+	flag.IntVar(&config.TCP_MIN_DELAY, "tcp.min_delay", libs.GetEnvInt("TCP_MIN_DELAY", 100), "Simulate long response minimal delay [miliseconds]. (TCP_MIN_DELAY)")
+	flag.IntVar(&config.TCP_MAX_DELAY, "tcp.max_delay", libs.GetEnvInt("TCP_MAX_DELAY", 5000), "Simulate long response max delay [miliseconds]. (TCP_MAX_DELAY)")
+	flag.IntVar(&config.TCP_ERROR_RATE, "tcp.error_rate", libs.GetEnvInt("TCP_ERROR_RATE", 0), "Simulate random error rate.  Set 1 - 10, where 10 = 100% error rate. (TCP_ERROR_RATE)")
 
 	flag.Parse()
 
@@ -76,6 +87,18 @@ func main() {
 		}
 		fmt.Printf(" DONE\n\n")
 	}
+
+	if config.ERROR_RATE > 10 {
+		slog.Warn("Maximal FAIL_RATE can be 10. Setting value to 10 (it means 100% error rate)")
+		config.ERROR_RATE = 10
+	}
+
+	if config.TCP_ERROR_RATE > 10 {
+		slog.Warn("Maximal TCP_ERROR_RATE can be 10. Setting value to 10 (it means 100% error rate)")
+		config.TCP_ERROR_RATE = 10
+	}
+	// TCP proxy generating delay and random errors
+	go server.TcpProxyJitter(config.TCP_ADDRESS, config.TCP_DEST_ADDRESS, config.TCP_MIN_DELAY, config.TCP_MAX_DELAY, config.TCP_ERROR_RATE)
 
 	// It is enought
 	router := server.InitRoutes()

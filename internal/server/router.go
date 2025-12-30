@@ -86,8 +86,17 @@ func InitRoutes() *gin.Engine {
 			case "basic":
 				handlers.BasicRoute(v1, endpoint)
 
-			case "sql":
-				handlers.SqlRoute(v1, endpoint)
+			case "psql":
+				// handlers.SqlRoute(v1, endpoint)
+				handlers.PSQLRoute(v1, endpoint)
+
+			case "redis":
+				//
+				handlers.RedisRoute(v1, endpoint)
+
+			case "shell":
+				// handlers.ShellRoute(v1, endpoint)
+				handlers.PSQLRoute(v1, endpoint)
 
 			default:
 				log.Printf("WARN: Skip, because kind has not been defined %s (%s)", endpoint.Path, endpoint.Kind)
