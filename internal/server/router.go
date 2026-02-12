@@ -10,6 +10,9 @@ import (
 	"gitlab.com/theztd/troll/internal/config"
 	"gitlab.com/theztd/troll/internal/handlers"
 	"gitlab.com/theztd/troll/internal/midleware"
+
+	"github.com/penglongli/gin-metrics/ginmetrics"
+	
 )
 
 func InitRoutes() *gin.Engine {
@@ -51,6 +54,35 @@ func InitRoutes() *gin.Engine {
 	// get global Monitor object
 	config.Metrics.SetMetricPath("/_healthz/metrics")
 	config.Metrics.Use(router)
+
+	// mtrics
+	gaugeMetric := &ginmetrics.Metric{
+		Type:        ginmetrics.Gauge,
+		Name:        "example_gauge_metric",
+		Description: "an example of gauge type metric",
+		Labels:      []string{"label1"},
+	}
+
+	// Add metric to global monitor object
+	_ = config.Metrics.AddMetric(gaugeMetric)
+
+	// TCP Proxy Metrics
+	tcpProxyRequests := &ginmetrics.Metric{
+		Type:        ginmetrics.Counter,
+		Name:        "tcp_proxy_requests_total",
+		Description: "Total number of TCP proxy requests",
+		Labels:      []string{"status"},
+	}
+	_ = config.Metrics.AddMetric(tcpProxyRequests)
+
+	tcpProxyDuration := &ginmetrics.Metric{
+		Type:        ginmetrics.Histogram,
+		Name:        "tcp_proxy_duration_seconds",
+		Description: "Duration of TCP proxy requests",
+		Labels:      []string{"status"},
+		Buckets:     []float64{0.1, 0.5, 1, 2, 5},
+	}
+	_ = config.Metrics.AddMetric(tcpProxyDuration)
 
 	// Websockets endpoint
 	router.GET("/ws", handlers.WebsocketRoute)
